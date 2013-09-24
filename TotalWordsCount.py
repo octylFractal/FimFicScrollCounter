@@ -3,7 +3,6 @@ import urllib.parse
 import http.cookiejar
 import http.cookies
 import sys
-import re
 
 cookie=''
 username=''
@@ -26,7 +25,6 @@ def init():
     urllib.request.install_opener(opener)
     if str(ret.read()).find('0') == -1:
         sys.exit('Login failed, check your username and password')
-    
     global cookie
     cookie=ret.info()['Set-Cookie']
     
@@ -46,15 +44,12 @@ def findAll(string, sub, listindex=[], offset=0):
 def addCommas(quantity):
     return "{:,}".format(quantity)
 
-# Init
 if username=='':
     username = input("Username: ")
 if password=='':
     password = input("Password: ")
 init()
 print('Connected to FimFiction')
-
-# Get number of favorites
 favData = getUrl('http://www.fimfiction.net/ajax/infocard_user.php?name=tux3')
 nFavs=0
 nFavPos=favData.find('=1">')
@@ -63,8 +58,6 @@ if nFavPos>=0:
 else:
     sys.exit('Error finding number of favorites')
 print ('Found '+str(nFavs)+' favorites')
-
-# Load each page of favorites and for each count number of stories
 nPages=-(-nFavs // 10)
 curPage=1
 nStories=0
@@ -79,13 +72,8 @@ while curPage<=nPages:
     pageWords=0
     for i in indexes:
         num=data[i+15:(data[i+15:].find('<')+i+15)]
-        #print('Found at '+str(i)+' : '+num)
         pageWords+=int(num.replace(',',''))
     indexes[:] = []
     totalWords+=pageWords
-    #print('Page words count : '+str(pageWords))
     curPage+=1
-    
 print('Total words count : '+str(addCommas(totalWords)))
-
-# http://www.fimfiction.net/index.php?view=category&tracking=1&order=updated&page=X

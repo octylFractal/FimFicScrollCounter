@@ -77,3 +77,4 @@ while curPage<=nPages:
     totalWords+=pageWords
     curPage+=1
 print('Total words count : '+str(addCommas(totalWords)))
+input('Press enter to exit')

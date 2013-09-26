@@ -53,8 +53,7 @@ try:
                 title=data[ji:(data[ji:].find('<')+ji)]
                 file.write(title+' '+num+'\n')
                 j+=1
-        
     file.close()
     print('Total words count : '+str("{:,}".format(totalWords)))
     input('Press enter to exit')
-except: failWith('Error:'+sys.exc_info()+'\nPress enter to exit')
+except BaseException as e: failWith('Error:'+str(e).encode('ascii', errors='replace').decode('ascii')+'\nPress enter to exit')

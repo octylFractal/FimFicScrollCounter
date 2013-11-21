@@ -20,7 +20,9 @@ def failWith(str):
 try:
     if username=='': username=input("Username: ")
     if password=='': password=input("Password: ")
-    if proxy!='': opener=build_opener(ProxyHandler({'http':proxy}),HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(http.cookiejar.CookieJar()))
+    if proxy!='': 
+        opener=build_opener(ProxyHandler({'http':proxy}),HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(http.cookiejar.CookieJar()))
+        print('Using proxy : '+proxy)
     else: opener=build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(http.cookiejar.CookieJar()))
     login_data=urllib.parse.urlencode({'username':username,'password':password}).encode('ascii')
     ret=opener.open('http://www.fimfiction.net/ajax/login.php',login_data)

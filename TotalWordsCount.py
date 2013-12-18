@@ -31,16 +31,16 @@ try:
     cookie=ret.info()['Set-Cookie']
     print('Connected to FimFiction')
     favData = getUrl('http://www.fimfiction.net/ajax/infocard_user.php?name='+username)
-    nFavs=0;curPage=0;nStories=0;totalWords=0;nFavPos=favData.find('=1">')
+    nFavs=0;curPage=1;nStories=0;totalWords=0;nFavPos=favData.find('=1">')
     if nFavPos>=0: nFavs=int(favData[nFavPos+4:(favData[nFavPos+4:].find(' ')+nFavPos+4)])
     else: failWith('Error finding number of favorites')
     print ('Found '+str(nFavs)+' favorites')
-    nPages=-(-nFavs // 10)
+    nPages=-(-nFavs // 10)+curPage
     file=open('readlist.txt','w')
     while curPage<=nPages:
         print('Loading page '+str(curPage)+'/'+str(nPages)+'...')
         data=getUrl('http://www.fimfiction.net/index.php?view=category&tracking=1&order=added&page='+str(curPage))
-        data=data.replace(r'\t','').replace(r'\r\n','').replace('&#039;','\'')
+        data=data.replace(r'\t','').replace(r'\r','').replace(r'\n','').replace('&#039;','\'').replace('&amp;','&').replace('&quot;','"')
         indexes=findAll(data,r'word_count"><b>')
         indexes2=findAll(data,r'data-minimum-size="0.5">')
         if len(indexes)!=len(indexes2):
@@ -55,6 +55,7 @@ try:
                 title=data[ji:(data[ji:].find('<')+ji)]
                 file.write(title+' '+num+'\n')
                 j+=1
+    file.write('Total words count : '+str(str("{:,}".format(totalWords))))
     file.close()
     print('Total words count : '+str("{:,}".format(totalWords)))
     input('Press enter to exit')

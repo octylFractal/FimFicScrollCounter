@@ -39,7 +39,7 @@ try:
     file=open('readlist.txt','w')
     while curPage<=nPages:
         print('Loading page '+str(curPage)+'/'+str(nPages)+'...')
-        data=getUrl('http://www.fimfiction.net/index.php?view=category&tracking=1&order=added&page='+str(curPage))
+        data=getUrl('http://www.fimfiction.net/index.php?view=category&tracking=1&order=date_added&page='+str(curPage))
         data=data.replace(r'\t','').replace(r'\r','').replace(r'\n','').replace('&#039;','\'').replace('&amp;','&').replace('&quot;','"')
         indexes=findAll(data,r'word_count"><b>')
         indexes2=findAll(data,r'data-minimum-size="0.5">')

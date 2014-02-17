@@ -30,7 +30,7 @@ try:
     if str(ret.read()).find('0') == -1: failWith('Login failed, check your username and password')
     cookie=ret.info()['Set-Cookie']
     print('Connected to FimFiction')
-    favData = getUrl('http://www.fimfiction.net/ajax/infocard_user.php?name='+username)
+    favData = getUrl('http://www.fimfiction.net/ajax/infocard_user.php?name='+username).replace(',','')
     nFavs=0;curPage=1;nStories=0;totalWords=0;nFavPos=favData.find('=1">')
     if nFavPos>=0: nFavs=int(favData[nFavPos+4:(favData[nFavPos+4:].find(' ')+nFavPos+4)])
     else: failWith('Error finding number of favorites')

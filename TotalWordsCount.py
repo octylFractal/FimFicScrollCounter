@@ -69,7 +69,7 @@ def main(username='',password='',proxy='') :
             data=data.replace(r'\t','').replace(r'\r','').replace(r'\n','').replace('&#039;','\'').replace('&amp;','&').replace('&quot;','"')
             # find word count in HTML
             indexes=findAll(data,r'word_count"><b>')
-            # something random
+            # find titles in HTML
             indexes2=findAll(data,r'data-minimum-size="0.5">')
             # story count mismatch check
             # usually indicates site layout change

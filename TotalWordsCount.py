@@ -30,11 +30,13 @@ def main(username='',password='',proxy='') :
         if proxy!='': 
             opener=build_opener(ProxyHandler({'http':proxy}),HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(http.cookiejar.CookieJar()))
             print('Using proxy : '+proxy)
-        else: opener=build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(http.cookiejar.CookieJar()))
+        else:
+            opener=build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(http.cookiejar.CookieJar()))
         login_data=urllib.parse.urlencode({'username':username,'password':password}).encode('ascii')
         ret=opener.open('http://www.fimfiction.net/ajax/login.php',login_data)
         install_opener(opener)
-        if str(ret.read()).find('0') == -1: failWith('Login failed, check your username and password')
+        if str(ret.read()).find('0') == -1: 
+            failWith('Login failed, check your username and password')
         cookie=ret.info()['Set-Cookie']
         print('Connected to FimFiction')
         favData = getUrl('http://www.fimfiction.net/ajax/infocard_user.php?name='+username).replace(',','')
@@ -68,6 +70,7 @@ def main(username='',password='',proxy='') :
         file.close()
         print('Total words count : '+str("{:,}".format(totalWords)))
         input('Press enter to exit')
-    except BaseException as e: failWith('Error:'+str(e).encode('ascii', errors='replace').decode('ascii')+'\nPress enter to exit')
+    except BaseException as e:
+        failWith('Error:'+str(e).encode('ascii', errors='replace').decode('ascii')+'\nPress enter to exit')
 if __name__ == "__main__" :
     main()

@@ -19,8 +19,8 @@ def findAll(string, sub, offset=0):
         i = string.find(sub, i + 1)
     return listindex    
     
-def failWith(str):
-    input(str)
+def failWith(stri):
+    input(stri)
     sys.exit()
 
 def main(username='',password='',proxy='') :

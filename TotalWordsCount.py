@@ -49,7 +49,7 @@ def loadStory(storyData):
     storywordcnt = int(deprettify(storywcpat.findall(storyData)[0]))
     if chapterwcadd != storywordcnt :
         print('Chapters added != Story Word Count')
-        raise SyntaxError()
+        return (storywordcnt, 0, title)
     strictchwc = strictcpat.findall(storyData)
     strictchwc = [int(deprettify(x)) for x in strictchwc]
     strictwc = sum(strictchwc)

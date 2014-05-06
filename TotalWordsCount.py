@@ -3,12 +3,14 @@ import http.cookiejar
 import http.cookies
 import sys
 import re
+import math
 from urllib.request import *
 cookie=''
 def getUrl(url):
     req = Request(url)
     req.add_header('Cookie', cookie+'; view_mature=true')
     conn = urlopen(req)
+    print('Requested ' + url)
     return str(conn.read())
     
 def findAll(string, sub, offset=0):
@@ -30,7 +32,7 @@ def loadStory(storyData):
 def getPage(pagenum):
     # pull page
     data = getUrl(
-        'http://www.fimfiction.net/index.php?view=category&tracking=1&order=date_added&page='
+        'http://www.fimfiction.net/index.php?view=category&tracking=1&compact_view=1&order=date_added&page='
         + str(pagenum))
     # horrid cleaning
     data = data.replace(r'\t','') \
@@ -40,6 +42,27 @@ def getPage(pagenum):
                .replace('&amp;','&') \
                .replace('&quot;','"')
     return data
+
+def deterPageCount(storyCount):
+    page1 = getPage(1)
+
+    # decode story count
+    # find title links in HTML
+    indexes=findAll(page1,r'class="title">')
+    # find word count in html
+    indexes2=findAll(page1,r'class="info">"')
+    print(indexes)
+    # story count mismatch check
+    # usually indicates site layout change
+    if len(indexes) == len(indexes2):
+        storiesPerPage = len(indexes)
+        if storiesPerPage == 0 :
+            print(page1)
+            return 0
+        print(storiesPerPage)
+        return math.ceil(storyCount / storiesPerPage)
+    else:
+        raise SyntaxError()
 
 def loadPage(pageData):
     pass
@@ -81,14 +104,16 @@ def main(username='',password='',proxy='') :
             nFavs = int(re.sub(favRegex, '\\1', favData))
         else:
             failWith('Error finding number of favorites')
-        print ('Found '+str(nFavs)+' favorites')
-        nPages=-(-nFavs // 10)+curPage
+        print ('Found ' + str(nFavs) + ' favorites')
+        nPages = deterPageCount(nFavs)
         file=open('readlist.txt','w')
 
         # read favs
         while curPage<=nPages:
             print('Loading page ' + str(curPage) + '/' + str(nPages) + '...')
             data = getPage(curPage)
+            print('Found links: ' + str(findAllLinks(data)))
+            curPage += 1
             """
             old code
 
@@ -117,11 +142,14 @@ def main(username='',password='',proxy='') :
         file.close()
         print('Total words count : '+str("{:,}".format(totalWords)))
         input('Press enter to exit')
-    except SystemExit as sysexit :
+    except SystemExit:
         pass
-    except KeyboardInterrupt as inter :
+    except KeyboardInterrupt:
         pass
     except BaseException as e:
-        failWith('Error:'+str(e).encode('ascii', errors='replace').decode('ascii')+'\nPress enter to exit')
+        try :
+            failWith('Error:'+str(e).encode('ascii', errors='replace').decode('ascii')+'\nPress enter to exit')
+        except SystemExit:
+            pass
 if __name__ == "__main__" :
     main()

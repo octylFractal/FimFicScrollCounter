@@ -49,8 +49,12 @@ def deterPageCount(storyCount):
     # decode story count
     # find title links in HTML
     indexes=findAll(page1,r'class="title">')
+
+    # this matches the heading title as well
+    # so we remove it
+    indexes = indexes[1:]
     # find word count in html
-    indexes2=findAll(page1,r'class="info">"')
+    indexes2=findAll(page1,r'class="info">')
     print(indexes)
     # story count mismatch check
     # usually indicates site layout change
@@ -62,6 +66,8 @@ def deterPageCount(storyCount):
         print(storiesPerPage)
         return math.ceil(storyCount / storiesPerPage)
     else:
+        print(indexes)
+        print(indexes2)
         raise SyntaxError()
 
 def loadPage(pageData):

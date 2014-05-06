@@ -46,7 +46,9 @@ def loadStory(storyData):
     chapterwordcnt = [int(deprettify(x)) for x in chapterwordcnt]
     chapterwcadd = sum(chapterwordcnt)
     storywordcnt = int(deprettify(storywcpat.findall(storyData)[0]))
-    print('CWC: {}; SWC: {}'.format(chapterwcadd, storywordcnt)) 
+    if chapterwcadd != storywordcnt :
+        print('Chapters added != Story Word Count')
+        raise SyntaxError()
 
 def deprettify(numstr):
     return numstr.replace(',', '')

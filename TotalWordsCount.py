@@ -12,7 +12,12 @@ def getUrl(url):
     req = Request(url)
     req.add_header('Cookie', cookie+'; view_mature=true')
     conn = urlopen(req)
-    return str(conn.read())
+    return str(conn.read()).replace(r'\t','') \
+               .replace(r'\r','') \
+               .replace(r'\n','') \
+               .replace('&#039;','\'') \
+               .replace('&amp;','&') \
+               .replace('&quot;','"')
     
 def findAll(string, sub, offset=0):
     listindex=[]
@@ -27,21 +32,21 @@ linkpat = re.compile('<a +href *= *[\'"](.+?)[\'"]')
 def findAllLinks(pageData):
     return linkpat.findall(pageData)
 
+storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>')
+
 def loadStory(storyData):
-    pass
+    """
+    Returns a tuple of data:
+    (word count, title, pretty print word count)
+    """
+    title = storytitlepat.findall(storyData)[0]
+    print(title)
 
 def getPage(pagenum):
     # pull page
     data = getUrl(
         'http://www.fimfiction.net/index.php?view=category&tracking=1&compact_view=1&order=date_added&page='
         + str(pagenum))
-    # horrid cleaning
-    data = data.replace(r'\t','') \
-               .replace(r'\r','') \
-               .replace(r'\n','') \
-               .replace('&#039;','\'') \
-               .replace('&amp;','&') \
-               .replace('&quot;','"')
     return data
 
 def deterPageCount(storyCount):
@@ -65,9 +70,6 @@ def deterPageCount(storyCount):
         return math.ceil(storyCount / storiesPerPage)
     else:
         raise SyntaxError()
-
-def loadPage(pageData):
-    pass
     
 def failWith(stri):
     input(stri)
@@ -143,7 +145,10 @@ def main(username='',password='',proxy='') :
                     file.write(title+' '+num+'\n')
                     j+=1
             """
-        print(allstorylinks)
+
+        for lnk in allstorylinks:
+            data = getUrl(lnk)
+            storytuple = loadStory(data)
 
         
         file.write('Total words count : ' + str("{:,}".format(totalWords)))

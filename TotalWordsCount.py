@@ -147,7 +147,7 @@ def main(username='',password='',proxy='') :
             data = getUrl(lnk)
             sdata = loadStory(data)
             writestr = prettify(sdata[1]) + '/' + prettify(sdata[0]) + ' words read of "' + sdata[2] + '"'
-            file.write(writestr)
+            file.write(writestr + '\n')
             print(writestr)
             totalWords += sdata[1]
 

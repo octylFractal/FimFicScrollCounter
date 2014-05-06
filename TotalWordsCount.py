@@ -19,6 +19,9 @@ def findAll(string, sub, offset=0):
         i = string.find(sub, i + 1)
     return listindex
 
+def findAllLinks(pageData):
+    pass
+
 def loadStory(storyData):
     pass
 
@@ -109,6 +112,8 @@ def main(username='',password='',proxy='') :
         print('Total words count : '+str("{:,}".format(totalWords)))
         input('Press enter to exit')
     except SystemExit as sysexit :
+        pass
+    except KeyboardInterrupt as inter :
         pass
     except BaseException as e:
         failWith('Error:'+str(e).encode('ascii', errors='replace').decode('ascii')+'\nPress enter to exit')

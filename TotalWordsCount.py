@@ -118,7 +118,9 @@ def main(username='',password='',proxy='') :
         while curPage<=nPages:
             print('Loading page ' + str(curPage) + '/' + str(nPages) + '...')
             data = getPage(curPage)
-            print('Found links: ' + str(findAllLinks(data)))
+            links = findAllLinks(data)
+            links = [x for x in links if x.find('story') > 0]
+            print(links)
             curPage += 1
             """
             old code

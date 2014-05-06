@@ -6,11 +6,12 @@ import re
 import math
 from urllib.request import *
 cookie=''
+fimbase = 'http://www.fimfiction.net'
+
 def getUrl(url):
     req = Request(url)
     req.add_header('Cookie', cookie+'; view_mature=true')
     conn = urlopen(req)
-    print('Requested ' + url)
     return str(conn.read())
     
 def findAll(string, sub, offset=0):
@@ -55,19 +56,14 @@ def deterPageCount(storyCount):
     indexes = indexes[1:]
     # find word count in html
     indexes2=findAll(page1,r'class="info">')
-    print(indexes)
     # story count mismatch check
     # usually indicates site layout change
     if len(indexes) == len(indexes2):
         storiesPerPage = len(indexes)
         if storiesPerPage == 0 :
-            print(page1)
             return 0
-        print(storiesPerPage)
         return math.ceil(storyCount / storiesPerPage)
     else:
-        print(indexes)
-        print(indexes2)
         raise SyntaxError()
 
 def loadPage(pageData):
@@ -112,15 +108,17 @@ def main(username='',password='',proxy='') :
             failWith('Error finding number of favorites')
         print ('Found ' + str(nFavs) + ' favorites')
         nPages = deterPageCount(nFavs)
-        file=open('readlist.txt','w')
+        file = open('readlist.txt','w')
 
+        allstorylinks = []
+        
         # read favs
         while curPage<=nPages:
             print('Loading page ' + str(curPage) + '/' + str(nPages) + '...')
             data = getPage(curPage)
             links = findAllLinks(data)
-            links = [x for x in links if x.find('story') > 0]
-            print(links)
+            links = [fimbase + x for x in links if x.find('story') > 0]
+            allstorylinks += links
             curPage += 1
             """
             old code
@@ -145,6 +143,8 @@ def main(username='',password='',proxy='') :
                     file.write(title+' '+num+'\n')
                     j+=1
             """
+        print(allstorylinks)
+
         
         file.write('Total words count : ' + str("{:,}".format(totalWords)))
         file.close()

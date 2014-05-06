@@ -19,8 +19,10 @@ def findAll(string, sub, offset=0):
         i = string.find(sub, i + 1)
     return listindex
 
+linkpat = re.compile('<a +href *= *[\'"](.+?)[\'"]')
+
 def findAllLinks(pageData):
-    pass
+    return linkpat.findall(pageData)
 
 def loadStory(storyData):
     pass
@@ -87,6 +89,9 @@ def main(username='',password='',proxy='') :
         while curPage<=nPages:
             print('Loading page ' + str(curPage) + '/' + str(nPages) + '...')
             data = getPage(curPage)
+            """
+            old code
+
             # find word count in HTML
             indexes=findAll(data,r'word_count"><b>')
             # find titles in HTML
@@ -106,6 +111,7 @@ def main(username='',password='',proxy='') :
                     title=data[ji:(data[ji:].find('<')+ji)]
                     file.write(title+' '+num+'\n')
                     j+=1
+            """
         
         file.write('Total words count : ' + str("{:,}".format(totalWords)))
         file.close()

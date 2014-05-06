@@ -141,37 +141,16 @@ def main(username='',password='',proxy='') :
             links = [fimbase + x for x in links if x.find('story') > 0]
             allstorylinks += links
             curPage += 1
-            """
-            old code
-
-            # find word count in HTML
-            indexes=findAll(data,r'word_count"><b>')
-            # find titles in HTML
-            indexes2=findAll(data,r'data-minimum-size="0.5">')
-            # story count mismatch check
-            # usually indicates site layout change
-            if len(indexes)!=len(indexes2):
-                j=-1
-                print('Error parsing page '+str(curPage)); file.write('Error parsing page '+str(curPage))
-            j=0;curPage+=1;
-            # eat stories
-            for i in indexes:
-                num=data[i+15:(data[i+15:].find('<')+i+15)]
-                totalWords+=int(num.replace(',',''))
-                if (j>=0):
-                    ji=indexes2[j]+24
-                    title=data[ji:(data[ji:].find('<')+ji)]
-                    file.write(title+' '+num+'\n')
-                    j+=1
-            """
 
         # process favs
         for lnk in allstorylinks:
             data = getUrl(lnk)
-            storytuple = loadStory(data)
-            print(storytuple)
+            sdata = loadStory(data)
+            writestr = prettify(sdata[1]) + '/' + prettify(sdata[0]) + ' words read of "' + sdata[2] + '"'
+            file.write(writestr)
+            print(writestr)
+            totalWords += sdata[1]
 
-        
         file.write('Total words count : ' + str("{:,}".format(totalWords)))
         file.close()
         print('Total words count : '+str("{:,}".format(totalWords)))

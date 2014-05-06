@@ -17,7 +17,27 @@ def findAll(string, sub, offset=0):
     while i >= 0:
         listindex.append(i)
         i = string.find(sub, i + 1)
-    return listindex    
+    return listindex
+
+def loadStory(storyData):
+    pass
+
+def getPage(pagenum):
+    # pull page
+    data = getUrl(
+        'http://www.fimfiction.net/index.php?view=category&tracking=1&order=date_added&page='
+        + str(pagenum))
+    # horrid cleaning
+    data = data.replace(r'\t','') \
+               .replace(r'\r','') \
+               .replace(r'\n','') \
+               .replace('&#039;','\'') \
+               .replace('&amp;','&') \
+               .replace('&quot;','"')
+    return data
+
+def loadPage(pageData):
+    pass
     
 def failWith(stri):
     input(stri)
@@ -63,10 +83,7 @@ def main(username='',password='',proxy='') :
         # read favs
         while curPage<=nPages:
             print('Loading page ' + str(curPage) + '/' + str(nPages) + '...')
-            # pull page
-            data=getUrl('http://www.fimfiction.net/index.php?view=category&tracking=1&order=date_added&page='+str(curPage))
-            # horrid cleaning
-            data=data.replace(r'\t','').replace(r'\r','').replace(r'\n','').replace('&#039;','\'').replace('&amp;','&').replace('&quot;','"')
+            data = getPage(curPage)
             # find word count in HTML
             indexes=findAll(data,r'word_count"><b>')
             # find titles in HTML

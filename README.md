@@ -1,8 +1,9 @@
 Fimfiction-TotalWordsRead
 =========================
 
-Gives you the total words count of all the stories in your favorites and the list of all the stories.
-This script requires Python >= 3.2.
+This script gives the word count of the read chapters in your favorites. It also gives total word count and total word count per story.
+
+Requires Python >= 3.2; for now.
 
 How to use :
 - Install Python 3.2, make sure you're connected to internet and start TotalWordsCount.py

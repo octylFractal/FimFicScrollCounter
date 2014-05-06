@@ -34,12 +34,13 @@ def findAllLinks(pageData):
 
 storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>')
 chapterpat = re.compile('<div class="word_count">(?!<b>)(.+?)<')
+strictcpat = re.compile('<i class=.+?chapter-read(?!-icon).+?<div class="word_count">(?!<b>)(.+?)<')
 storywcpat = re.compile('<div class="word_count"><b>(.+?)<')
 
 def loadStory(storyData):
     """
     Returns a tuple of data:
-    (word count, title, pretty print word count)
+    (word count, read word count, title)
     """
     title = storytitlepat.findall(storyData)[0]
     chapterwordcnt = chapterpat.findall(storyData)
@@ -49,6 +50,10 @@ def loadStory(storyData):
     if chapterwcadd != storywordcnt :
         print('Chapters added != Story Word Count')
         raise SyntaxError()
+    strictchwc = strictcpat.findall(storyData)
+    strictchwc = [int(deprettify(x)) for x in strictchwc]
+    strictwc = sum(strictchwc)
+    return (chapterwcadd, strictwc, title)
 
 def deprettify(numstr):
     return numstr.replace(',', '')
@@ -160,9 +165,11 @@ def main(username='',password='',proxy='') :
                     j+=1
             """
 
+        # process favs
         for lnk in allstorylinks:
             data = getUrl(lnk)
             storytuple = loadStory(data)
+            print(storytuple)
 
         
         file.write('Total words count : ' + str("{:,}".format(totalWords)))

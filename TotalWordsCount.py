@@ -33,6 +33,8 @@ def findAllLinks(pageData):
     return linkpat.findall(pageData)
 
 storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>')
+chapterpat = re.compile('<div class="word_count">(?!<b>)(.+?)<')
+storywcpat = re.compile('<div class="word_count"><b>(.+?)<')
 
 def loadStory(storyData):
     """
@@ -40,7 +42,17 @@ def loadStory(storyData):
     (word count, title, pretty print word count)
     """
     title = storytitlepat.findall(storyData)[0]
-    print(title)
+    chapterwordcnt = chapterpat.findall(storyData)
+    chapterwordcnt = [int(deprettify(x)) for x in chapterwordcnt]
+    chapterwcadd = sum(chapterwordcnt)
+    storywordcnt = int(deprettify(storywcpat.findall(storyData)[0]))
+    print('CWC: {}; SWC: {}'.format(chapterwcadd, storywordcnt)) 
+
+def deprettify(numstr):
+    return numstr.replace(',', '')
+
+def prettify(num):
+    return "{:,}".format(num)
 
 def getPage(pagenum):
     # pull page

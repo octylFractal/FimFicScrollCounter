@@ -91,7 +91,8 @@ def deterPageCount(storyCount):
         raise SyntaxError()
     
 def failWith(stri):
-    input(stri)
+    if input(stri) == "debug" :
+        raise RuntimeError()
     sys.exit()
 
 def main(username='',password='',proxy='') :

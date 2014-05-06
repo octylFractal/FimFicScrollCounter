@@ -1,10 +1,20 @@
-import urllib.parse
-import http.cookiejar
-import http.cookies
+import py2to3compat
+py2to3compat.fix(__builtins__)
+if py2to3compat.PYTHON_VERSION_MAJOR > 2:
+    # uses new name
+    import urllib.parse as parse
+    from http import cookiejar, cookies
+    from urllib.request import *
+else:
+    import urllib as parse
+    # uses py3 name
+    import cookielib as cookiejar
+    # uses py3 name
+    import Cookie as cookies
+    from urllib2 import *
 import sys
 import re
 import math
-from urllib.request import *
 cookie=''
 fimbase = 'http://www.fimfiction.net'
 
@@ -91,8 +101,9 @@ def deterPageCount(storyCount):
         raise SyntaxError()
     
 def failWith(stri):
-    if input(stri) == "debug" :
-        raise RuntimeError()
+    print(stri)
+    if input("Press enter to exit") == "debug" :
+        raise AssertionError(stri)
     sys.exit()
 
 def main(username='',password='',proxy='') :
@@ -103,12 +114,12 @@ def main(username='',password='',proxy='') :
         if password=='': password = input("Password: ")
         # proxy
         if proxy!='': 
-            opener = build_opener(ProxyHandler({'http':proxy}),HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(http.cookiejar.CookieJar()))
+            opener = build_opener(ProxyHandler({'http':proxy}),HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(cookiejar.CookieJar()))
             print('Using proxy : ' + proxy)
         else:
-            opener = build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(http.cookiejar.CookieJar()))
+            opener = build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(cookiejar.CookieJar()))
         # setup login
-        login_data = urllib.parse.urlencode({'username':username,'password':password}).encode('ascii')
+        login_data = parse.urlencode({'username':username,'password':password}).encode('ascii')
         ret = opener.open('http://www.fimfiction.net/ajax/login.php',login_data)
         install_opener(opener)
         # check fail
@@ -152,18 +163,23 @@ def main(username='',password='',proxy='') :
             print(writestr)
             totalWords += sdata[1]
 
-        file.write('Total words count : ' + str("{:,}".format(totalWords)))
+        file.write('Total words count: ' + str("{:,}".format(totalWords)))
         file.close()
-        print('Total words count : '+str("{:,}".format(totalWords)))
+        print('Total words count: '+str("{:,}".format(totalWords)))
         input('Press enter to exit')
     except SystemExit:
         pass
     except KeyboardInterrupt:
         pass
+    """
     except BaseException as e:
         try :
-            failWith('Error:'+str(e).encode('ascii', errors='replace').decode('ascii')+'\nPress enter to exit')
+            failWith('Error: ' + str(e).encode('ascii', errors='replace').decode('ascii'))
         except SystemExit:
             pass
+        except AssertionError:
+            print('No internet; kenzierocks cannot give you a stack trace')
 if __name__ == "__main__" :
     main()
+
+"""

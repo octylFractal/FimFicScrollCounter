@@ -134,11 +134,11 @@ def main(username='',password='',proxy='') :
         nStories = 0
         totalWords = 0
         # check for favs
-        favRegex = '^.*?(\d+) fav.*$'
-        if re.match(favRegex, favData) != None:
-            nFavs = int(re.sub(favRegex, '\\1', favData))
+        favRegex = '.*?(\d+) fav.*'
+        if re.search(favRegex, favData, re.MULTILINE) != None:
+            nFavs = int(re.search(favRegex, favData, re.MULTILINE).group(1))
         else:
-            print(favRegex)
+            print(favData)
             raise LookupError('Error finding number of favorites')
         print ('Found ' + str(nFavs) + ' favorites')
         nPages = deterPageCount(nFavs)

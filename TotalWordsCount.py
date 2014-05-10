@@ -135,10 +135,11 @@ def main(username='',password='',proxy='') :
         totalWords = 0
         # check for favs
         favRegex = '^.*?(\d+) fav.*$'
-        if re.search(favRegex, favData) != None:
+        if re.match(favRegex, favData) != None:
             nFavs = int(re.sub(favRegex, '\\1', favData))
         else:
-            failWith('Error finding number of favorites')
+            print(favRegex)
+            raise LookupError('Error finding number of favorites')
         print ('Found ' + str(nFavs) + ' favorites')
         nPages = deterPageCount(nFavs)
         file = open('readlist.txt','w')
@@ -171,15 +172,14 @@ def main(username='',password='',proxy='') :
         pass
     except KeyboardInterrupt:
         pass
-    """
     except BaseException as e:
+        excinfo = sys.exc_info()
+        print(excinfo)
         try :
             failWith('Error: ' + str(e).encode('ascii', errors='replace').decode('ascii'))
         except SystemExit:
             pass
         except AssertionError:
-            print('No internet; kenzierocks cannot give you a stack trace')
+            raise excinfo[1], None, excinfo[2]
 if __name__ == "__main__" :
     main()
-
-"""

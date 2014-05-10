@@ -42,10 +42,10 @@ linkpat = re.compile('<a +href *= *[\'"](.+?)[\'"]')
 def findAllLinks(pageData):
     return linkpat.findall(pageData)
 
-storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>')
-chapterpat = re.compile('<div class="word_count">(?!<b>)(.+?)<')
-strictcpat = re.compile('<i class=.+?chapter-read(?!-icon).+?<div class="word_count">(?!<b>)(.+?)<')
-storywcpat = re.compile('<div class="word_count"><b>(.+?)<')
+storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>', re.MULTILINE)
+chapterpat = re.compile('<div class="word_count">\s+?(?!<b>)(.+?)<', re.MULTILINE)
+strictcpat = re.compile('<i class=.+?chapter-read(?!-icon).+?<div class="word_count">(?!<b>)(.+?)<', re.MULTILINE)
+storywcpat = re.compile('<div class="word_count">\s+?<b>(.+?)<', re.MULTILINE)
 
 def loadStory(storyData):
     """
@@ -106,6 +106,8 @@ def failWith(stri):
         raise AssertionError(stri)
     sys.exit()
 
+globdebug = dict()
+
 def main(username='',password='',proxy='') :
     global cookie
     try :
@@ -145,6 +147,8 @@ def main(username='',password='',proxy='') :
         file = open('readlist.txt','w')
 
         allstorylinks = []
+
+        globdebug['links'] = allstorylinks
         
         # read favs
         while curPage<=nPages:
@@ -157,6 +161,7 @@ def main(username='',password='',proxy='') :
 
         # process favs
         for lnk in allstorylinks:
+            globdebug['lastlink'] = lnk
             data = getUrl(lnk)
             sdata = loadStory(data)
             writestr = prettify(sdata[1]) + '/' + prettify(sdata[0]) + ' words read of "' + sdata[2] + '"'
@@ -174,7 +179,6 @@ def main(username='',password='',proxy='') :
         pass
     except BaseException as e:
         excinfo = sys.exc_info()
-        print(excinfo)
         try :
             failWith('Error: ' + str(e).encode('ascii', errors='replace').decode('ascii'))
         except SystemExit:

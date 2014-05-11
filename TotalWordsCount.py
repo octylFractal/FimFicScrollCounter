@@ -23,8 +23,8 @@ def getUrl(url):
     req.add_header('Cookie', cookie+'; view_mature=true')
     conn = urlopen(req)
     return str(conn.read()).replace(r'\t','') \
-               .replace(r'\r','') \
-               .replace(r'\n','') \
+               .replace('\r','') \
+               .replace('\n','') \
                .replace('&#039;','\'') \
                .replace('&amp;','&') \
                .replace('&quot;','"')
@@ -42,10 +42,10 @@ linkpat = re.compile('<a +href *= *[\'"](.+?)[\'"]')
 def findAllLinks(pageData):
     return linkpat.findall(pageData)
 
-storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>', re.MULTILINE)
-chapterpat = re.compile('<div class="word_count">\s+?(?!<b>)(.+?)<', re.MULTILINE | re.DOTALL)
-strictcpat = re.compile(r'<i class=.+?chapter-read(?!-icon).+?<div class="word_count">\s+?(?!<b>)(.+?)<', re.MULTILINE | re.DOTALL)
-storywcpat = re.compile('<div class="word_count">\s+?<b>(.+?)<', re.MULTILINE)
+storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>')
+chapterpat = re.compile('<div class="word_count">\s*?(?!<b>)(.+?)<')
+strictcpat = re.compile('<i class=.+?chapter-read(?!-icon).+?<div class="word_count">\s*?(?!<b>)(.+?)<')
+storywcpat = re.compile('<div class="word_count">\s*?<b>(.+?)<')
 
 def loadStory(storyData):
     """
@@ -60,13 +60,12 @@ def loadStory(storyData):
     if chapterwcadd != storywordcnt :
         print('Chapters added != Story Word Count')
         return (storywordcnt, 0, title)
-    print(strictcpat.search(storyData))
-    print(strictcpat.match(storyData))
-    print(strictcpat.findall(storyData))
-    globdebug['lastdata'] = storyData
-    strictchwc = strictcpat.search(storyData).groups()
-    strictchwc = [int(deprettify(x)) for x in strictchwc if x.strip() != '']
-    strictwc = sum(strictchwc)
+    searchs = strictcpat.search(storyData)
+    strictwc = 0
+    if searchs:
+        strictchwc = searchs.groups()
+        strictchwc = [int(deprettify(x)) for x in strictchwc if x.strip() != '']
+        strictwc = sum(strictchwc)
     return (chapterwcadd, strictwc, title)
 
 def deprettify(numstr):

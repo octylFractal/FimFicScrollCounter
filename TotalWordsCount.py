@@ -43,8 +43,8 @@ def findAllLinks(pageData):
     return linkpat.findall(pageData)
 
 storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>', re.MULTILINE)
-chapterpat = re.compile('<div class="word_count">\s+?(?!<b>)(.+?)<', re.MULTILINE)
-strictcpat = re.compile('<i class=.+?chapter-read(?!-icon).+?<div class="word_count">(?!<b>)(.+?)<', re.MULTILINE)
+chapterpat = re.compile('<div class="word_count">\s+?(?!<b>)(.+?)<', re.MULTILINE | re.DOTALL)
+strictcpat = re.compile(r'<i class=.+?chapter-read(?!-icon).+?<div class="word_count">\s+?(?!<b>)(.+?)<', re.MULTILINE | re.DOTALL)
 storywcpat = re.compile('<div class="word_count">\s+?<b>(.+?)<', re.MULTILINE)
 
 def loadStory(storyData):
@@ -54,19 +54,23 @@ def loadStory(storyData):
     """
     title = storytitlepat.findall(storyData)[0]
     chapterwordcnt = chapterpat.findall(storyData)
-    chapterwordcnt = [int(deprettify(x)) for x in chapterwordcnt]
+    chapterwordcnt = [int(deprettify(x)) for x in chapterwordcnt if x.strip() != '']
     chapterwcadd = sum(chapterwordcnt)
     storywordcnt = int(deprettify(storywcpat.findall(storyData)[0]))
     if chapterwcadd != storywordcnt :
         print('Chapters added != Story Word Count')
         return (storywordcnt, 0, title)
-    strictchwc = strictcpat.findall(storyData)
-    strictchwc = [int(deprettify(x)) for x in strictchwc]
+    print(strictcpat.search(storyData))
+    print(strictcpat.match(storyData))
+    print(strictcpat.findall(storyData))
+    globdebug['lastdata'] = storyData
+    strictchwc = strictcpat.search(storyData).groups()
+    strictchwc = [int(deprettify(x)) for x in strictchwc if x.strip() != '']
     strictwc = sum(strictchwc)
     return (chapterwcadd, strictwc, title)
 
 def deprettify(numstr):
-    return numstr.replace(',', '')
+    return numstr.replace(',', '').strip()
 
 def prettify(num):
     return "{:,}".format(num)
@@ -96,7 +100,7 @@ def deterPageCount(storyCount):
         storiesPerPage = len(indexes)
         if storiesPerPage == 0 :
             return 0
-        return math.ceil(storyCount / storiesPerPage)
+        return int(math.ceil(storyCount / storiesPerPage))
     else:
         raise SyntaxError()
     

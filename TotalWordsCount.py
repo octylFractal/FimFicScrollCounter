@@ -25,6 +25,8 @@ def getUrl(url):
     return str(conn.read()).replace(r'\t','') \
                .replace('\r','') \
                .replace('\n','') \
+               .replace(r'\r','') \
+               .replace(r'\n','') \
                .replace('&#039;','\'') \
                .replace('&amp;','&') \
                .replace('&quot;','"')
@@ -181,12 +183,14 @@ def main(username='',password='',proxy='') :
     except KeyboardInterrupt:
         pass
     except BaseException as e:
-        excinfo = sys.exc_info()
+        reraise = False
         try :
             failWith('Error: ' + str(e).encode('ascii', errors='replace').decode('ascii'))
         except SystemExit:
             pass
         except AssertionError:
-            raise excinfo[1], None, excinfo[2]
+            reraise = True
+        if reraise :
+            raise
 if __name__ == "__main__" :
     main()

@@ -99,7 +99,7 @@ def deterPageCount(storyCount):
         storiesPerPage = len(indexes)
         if storiesPerPage == 0 :
             return 0
-        return int(math.ceil(storyCount / storiesPerPage))
+        return int(math.ceil(float(storyCount) / float(storiesPerPage)))
     else:
         raise SyntaxError()
     

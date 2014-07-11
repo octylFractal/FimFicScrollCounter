@@ -39,15 +39,15 @@ def findAll(string, sub, offset=0):
         i = string.find(sub, i + 1)
     return listindex
 
-linkpat = re.compile('<a +href *= *[\'"](.+?)[\'"]')
+linkpat = re.compile(r'<a +href *= *[\'"](.+?)[\'"]', re.DOTALL | re.MULTILINE)
 
 def findAllLinks(pageData):
     return linkpat.findall(pageData)
 
-storytitlepat = re.compile('<a class="story_name.+?>(.+?)</a>')
-chapterpat = re.compile('<div class="word_count">\s*?(?!<b>)(.+?)<')
-strictcpat = re.compile('<i class=.+?chapter-read(?!-icon).+?<div class="word_count">\s*?(?!<b>)(.+?)<')
-storywcpat = re.compile('<div class="word_count">\s*?<b>(.+?)<')
+storytitlepat = re.compile(r'<a class="story_name.+?>(.+?)</a>', re.DOTALL | re.MULTILINE)
+chapterpat = re.compile(r'<div class="word_count">\s*?(?!<b>)(.+?)<', re.DOTALL | re.MULTILINE)
+strictcpat = re.compile(r'<i class=.+?chapter-read(?!-icon).+?<div class="word_count">\s*?(?!<b>)(.+?)<', re.DOTALL | re.MULTILINE)
+storywcpat = re.compile(r'<div class="word_count">\s*?<b>(.+?)<', re.DOTALL | re.MULTILINE)
 
 def loadStory(storyData):
     """
@@ -62,12 +62,10 @@ def loadStory(storyData):
     if chapterwcadd != storywordcnt :
         print('Chapters added != Story Word Count')
         return (storywordcnt, 0, title)
-    searchs = strictcpat.search(storyData)
     strictwc = 0
-    if searchs:
-        strictchwc = searchs.groups()
-        strictchwc = [int(deprettify(x)) for x in strictchwc if x.strip() != '']
-        strictwc = sum(strictchwc)
+    strictchwc = strictcpat.findall(storyData)
+    strictchwc = [int(deprettify(x)) for x in strictchwc if x.strip() != '']
+    strictwc = sum(strictchwc)
     return (chapterwcadd, strictwc, title)
 
 def deprettify(numstr):

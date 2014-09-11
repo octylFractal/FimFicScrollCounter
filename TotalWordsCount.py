@@ -175,7 +175,7 @@ def main(username='',password='',proxy='') :
 
         file.write('Total partially read stories count: ' + str("{:,}".format(partStoryCount)))
         file.close()
-        print('Total words count: '+str("{:,}".format(partStoryCount)))
+        print('Total partially read stories count: '+str("{:,}".format(partStoryCount)))
         input('Press enter to exit')
     except SystemExit:
         pass

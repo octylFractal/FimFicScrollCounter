@@ -39,10 +39,13 @@ def findAll(string, sub, offset=0):
         i = string.find(sub, i + 1)
     return listindex
 
+# block read list
+waituntilpat = re.compile(r'<table +class *= *[\'"]browse_stories[\'"]', re.DOTALL | re.MULTILINE)
 linkpat = re.compile(r'<a +href *= *[\'"](.+?)[\'"]', re.DOTALL | re.MULTILINE)
 
 def findAllLinks(pageData):
-    return linkpat.findall(pageData)
+    starthere = waituntilpat.search(pageData).start()
+    return linkpat.findall(pageData, starthere)
 
 storytitlepat = re.compile(r'<a class="story_name.+?>(.+?)</a>', re.DOTALL | re.MULTILINE)
 chapterpat = re.compile(r'<div class="word_count">\s*?(?!<b>)(.+?)<', re.DOTALL | re.MULTILINE)

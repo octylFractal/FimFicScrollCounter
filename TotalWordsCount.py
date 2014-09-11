@@ -16,7 +16,7 @@ import sys
 import re
 import math
 cookie=''
-fimbase = 'http://www.fimfiction.net'
+fimbase = 'https://www.fimfiction.net'
 
 def getUrl(url):
     req = Request(url)
@@ -80,7 +80,7 @@ def prettify(num):
 def getPage(pagenum):
     # pull page
     data = getUrl(
-        'http://www.fimfiction.net/index.php?view=category&tracking=1&compact_view=1&order=date_added&page='
+        fimbase + '/index.php?view=category&tracking=1&compact_view=1&order=date_added&page='
         + str(pagenum))
     return data
 
@@ -115,7 +115,7 @@ def failWith(stri):
 globdebug = dict()
 
 def main(username='',password='',proxy='') :
-    global cookie
+    global cookie, globdebug
     try :
         # request basic data
         if username=='': username = input("Username: ")
@@ -128,7 +128,7 @@ def main(username='',password='',proxy='') :
             opener = build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(cookiejar.CookieJar()))
         # setup login
         login_data = parse.urlencode({'username':username,'password':password}).encode('ascii')
-        ret = opener.open('http://www.fimfiction.net/ajax/login.php',login_data)
+        ret = opener.open(fimbase + '/ajax/login.php',login_data)
         install_opener(opener)
         # check fail
         if str(ret.read()).find('0') == -1: 
@@ -136,15 +136,17 @@ def main(username='',password='',proxy='') :
         cookie=ret.info()['Set-Cookie']
         print('Connected to FimFiction')
         # load fav data
-        favData = getUrl('http://www.fimfiction.net/ajax/infocard_user.php?name='+username).replace(',','')
+        favData = getUrl(fimbase + '/ajax/infocard_user.php?name='+username).replace(',','')
         nFavs = 0
         curPage = 1
         nStories = 0
         partStoryCount = 0
         # check for favs
-        favRegex = '.*?(\d+) fav.*'
-        if re.search(favRegex, favData, re.MULTILINE) != None:
-            nFavs = int(re.search(favRegex, favData, re.MULTILINE).group(1))
+        favURLRegex = r'<a href="(/index.php\?view=category&user=\d+&tracking=1)">\d+ favourites'
+        favURLResult = re.search(favURLRegex, favData, re.MULTILINE)
+        favNumRegex = r'<div class="search_results_count">\s+Viewing <b>\d+</b> - <b>\d+</b> of <b>(\d+)</b> stories\s+</div>'
+        if favURLResult != None:
+            nFavs = int(re.search(favNumRegex, getUrl(fimbase + favURLResult.group(1)), re.MULTILINE).group(1))
         else:
             print(favData)
             raise LookupError('Error finding number of favorites')
@@ -166,12 +168,13 @@ def main(username='',password='',proxy='') :
             curPage += 1
 
         if len(allstorylinks) < nFavs:
-            pass#raise ValueError(str(len(allstorylinks)) + "<" + str(nFavs))
+            raise ValueError(str(len(allstorylinks)) + "<" + str(nFavs))
 
         procd = 0
         lastput = 0
 
         # process favs
+        print('Processing...')
         for lnk in allstorylinks:
             globdebug['lastlink'] = lnk
             data = getUrl(lnk)

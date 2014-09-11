@@ -162,6 +162,9 @@ def main(username='',password='',proxy='') :
             allstorylinks += links
             curPage += 1
 
+        procd = 0
+        lastput = 0
+
         # process favs
         for lnk in allstorylinks:
             globdebug['lastlink'] = lnk
@@ -172,6 +175,10 @@ def main(username='',password='',proxy='') :
                 file.write(writestr + '\n')
                 print(writestr)
                 partStoryCount += 1
+            if math.floor((procd / len(allstorylinks)) * 100) > lastput + 5:
+                lastput = math.floor((procd / len(allstorylinks)) * 100)
+                print('About ' + str(lastput) + '% done')
+            procd += 1
 
         file.write('Total partially read stories count: ' + str("{:,}".format(partStoryCount)))
         file.close()

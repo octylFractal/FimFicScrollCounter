@@ -165,6 +165,9 @@ def main(username='',password='',proxy='') :
             allstorylinks += links
             curPage += 1
 
+        if len(allstorylinks) < nFavs:
+            pass#raise ValueError(str(len(allstorylinks)) + "<" + str(nFavs))
+
         procd = 0
         lastput = 0
 
@@ -178,8 +181,8 @@ def main(username='',password='',proxy='') :
                 file.write(writestr + '\n')
                 print(writestr)
                 partStoryCount += 1
-            if math.floor((procd / len(allstorylinks)) * 100) > lastput + 5:
-                lastput = math.floor((procd / len(allstorylinks)) * 100)
+            if math.floor((float(procd) / float(len(allstorylinks))) * 100) > lastput + 5:
+                lastput = math.floor((float(procd) / float(len(allstorylinks))) * 100)
                 print('About ' + str(lastput) + '% done')
             procd += 1
 

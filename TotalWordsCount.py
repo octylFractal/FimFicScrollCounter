@@ -137,7 +137,7 @@ def main(username='',password='',proxy='') :
         nFavs = 0
         curPage = 1
         nStories = 0
-        totalWords = 0
+        partStoryCount = 0
         # check for favs
         favRegex = '.*?(\d+) fav.*'
         if re.search(favRegex, favData, re.MULTILINE) != None:
@@ -167,14 +167,15 @@ def main(username='',password='',proxy='') :
             globdebug['lastlink'] = lnk
             data = getUrl(lnk)
             sdata = loadStory(data)
-            writestr = prettify(sdata[1]) + '/' + prettify(sdata[0]) + ' words read of "' + sdata[2] + '"'
-            file.write(writestr + '\n')
-            print(writestr)
-            totalWords += sdata[1]
+            if sdata[1] < sdata[0] and sdata[1] != 0:
+                writestr = 'Partially read: ' + prettify(sdata[1]) + '/' + prettify(sdata[0]) + ' words read of "' + sdata[2] + '"'
+                file.write(writestr + '\n')
+                print(writestr)
+                partStoryCount += 1
 
-        file.write('Total words count: ' + str("{:,}".format(totalWords)))
+        file.write('Total partially read stories count: ' + str("{:,}".format(partStoryCount)))
         file.close()
-        print('Total words count: '+str("{:,}".format(totalWords)))
+        print('Total words count: '+str("{:,}".format(partStoryCount)))
         input('Press enter to exit')
     except SystemExit:
         pass

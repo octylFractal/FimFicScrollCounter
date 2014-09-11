@@ -15,6 +15,11 @@ else:
 import sys
 import re
 import math
+
+# some differnt data getters
+TOTAL_WORDS_READ = "totalWords"
+PARTIALLY_READ_STORIES = "partialStories"
+
 cookie=''
 fimbase = 'https://www.fimfiction.net'
 
@@ -114,7 +119,7 @@ def failWith(stri):
 
 globdebug = dict()
 
-def main(username='',password='',proxy='') :
+def main(username='',password='',method=TOTAL_WORDS_READ,proxy='') :
     global cookie, globdebug
     try :
         # request basic data
@@ -140,7 +145,7 @@ def main(username='',password='',proxy='') :
         nFavs = 0
         curPage = 1
         nStories = 0
-        partStoryCount = 0
+        counter = 0
         # check for favs
         favURLRegex = r'<a href="(/index.php\?view=category&user=\d+&tracking=1)">\d+ favourites'
         favURLResult = re.search(favURLRegex, favData, re.MULTILINE)
@@ -179,19 +184,31 @@ def main(username='',password='',proxy='') :
             globdebug['lastlink'] = lnk
             data = getUrl(lnk)
             sdata = loadStory(data)
-            if sdata[1] < sdata[0] and sdata[1] != 0:
-                writestr = 'Partially read: ' + prettify(sdata[1]) + '/' + prettify(sdata[0]) + ' words read of "' + sdata[2] + '"'
-                file.write(writestr + '\n')
-                print(writestr)
-                partStoryCount += 1
+            writestr = None
+            if method == TOTAL_WORDS_READ:
+                writestr = totalLoop(sdata)
+            elif method == PARTIALLY_READ_STORIES:
+                writestr = paritalLoop(sdata)
+            file.write(writestr + '\n')
+            print(writestr)
+            if method == TOTAL_WORDS_READ:
+                counter += totalInc(sdata)
+            elif method == PARTIALLY_READ_STORIES:
+                counter += paritalInc(sdata)
             if math.floor((float(procd) / float(len(allstorylinks))) * 100) > lastput + 5:
                 lastput = math.floor((float(procd) / float(len(allstorylinks))) * 100)
                 print('About ' + str(lastput) + '% done')
             procd += 1
 
-        file.write('Total partially read stories count: ' + str("{:,}".format(partStoryCount)))
+        
+        if method == TOTAL_WORDS_READ:
+            writestr = totalEnd(counter)
+        elif method == PARTIALLY_READ_STORIES:
+            writestr = paritalEnd(counter)
+
+        file.write(writestr + '\n')
         file.close()
-        print('Total partially read stories count: '+str("{:,}".format(partStoryCount)))
+        print(writestr)
         input('Press enter to exit')
     except SystemExit:
         pass
@@ -207,5 +224,20 @@ def main(username='',password='',proxy='') :
             reraise = True
         if reraise :
             raise
+def partialLoop(storyData):
+    if storyData[1] < storyData[0] and storyData[1] != 0:
+        return 'Partially read: ' + prettify(storyData[1]) + '/' + prettify(storyData[0]) + ' words read of "' + storyData[2] + '"'
+    return None
+def partialEnd(counter):
+    return 'Total partially read stories count: ' + prettify(counter)
+def partialInc(storyData):
+    return 1
+def totalLoop(storyData):
+    return prettify(storyData[1]) + '/' + prettify(storyData[0]) + ' words read of "' + storyData[2] + '"'
+def totalEnd(counter):
+    return 'Total words read: ' + prettify(counter)
+def totalInc(storyData):
+    return storyData[1]
+    
 if __name__ == "__main__" :
     main()

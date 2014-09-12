@@ -23,11 +23,20 @@ PARTIALLY_READ_STORIES = "partialStories"
 cookie=''
 fimbase = 'https://www.fimfiction.net'
 
+# cache for multiple runs in one go
+urlCache = {}
+def resetCache():
+    global urlCache
+    urlCache = {}
+
 def getUrl(url):
+    global urlCache
+    if url in urlCache.keys() :
+        return urlCache[url]
     req = Request(url)
     req.add_header('Cookie', cookie+'; view_mature=true')
     conn = urlopen(req)
-    return str(conn.read()).replace(r'\t','') \
+    res = str(conn.read()).replace(r'\t','') \
                .replace('\r','') \
                .replace('\n','') \
                .replace(r'\r','') \
@@ -35,6 +44,8 @@ def getUrl(url):
                .replace('&#039;','\'') \
                .replace('&amp;','&') \
                .replace('&quot;','"')
+    urlCache[url] = res
+    return res
     
 def findAll(string, sub, offset=0):
     listindex=[]
@@ -188,13 +199,14 @@ def main(username='',password='',method=TOTAL_WORDS_READ,proxy='') :
             if method == TOTAL_WORDS_READ:
                 writestr = totalLoop(sdata)
             elif method == PARTIALLY_READ_STORIES:
-                writestr = paritalLoop(sdata)
-            file.write(writestr + '\n')
-            print(writestr)
-            if method == TOTAL_WORDS_READ:
-                counter += totalInc(sdata)
-            elif method == PARTIALLY_READ_STORIES:
-                counter += paritalInc(sdata)
+                writestr = partialLoop(sdata)
+            if writestr != None:
+                file.write(writestr + '\n')
+                print(writestr)
+                if method == TOTAL_WORDS_READ:
+                    counter += totalInc(sdata)
+                elif method == PARTIALLY_READ_STORIES:
+                    counter += partialInc(sdata)
             if math.floor((float(procd) / float(len(allstorylinks))) * 100) > lastput + 5:
                 lastput = math.floor((float(procd) / float(len(allstorylinks))) * 100)
                 print('About ' + str(lastput) + '% done')
@@ -204,7 +216,7 @@ def main(username='',password='',method=TOTAL_WORDS_READ,proxy='') :
         if method == TOTAL_WORDS_READ:
             writestr = totalEnd(counter)
         elif method == PARTIALLY_READ_STORIES:
-            writestr = paritalEnd(counter)
+            writestr = partialEnd(counter)
 
         file.write(writestr + '\n')
         file.close()
@@ -238,6 +250,6 @@ def totalEnd(counter):
     return 'Total words read: ' + prettify(counter)
 def totalInc(storyData):
     return storyData[1]
-    
+
 if __name__ == "__main__" :
     main()

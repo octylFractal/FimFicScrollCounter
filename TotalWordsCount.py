@@ -16,6 +16,9 @@ import sys
 import re
 import math
 
+# local libs
+import autharea
+
 # some differnt data getters
 TOTAL_WORDS_READ = "totalWords"
 PARTIALLY_READ_STORIES = "partialStories"
@@ -33,7 +36,7 @@ def getUrl(url):
     if url in urlCache.keys() :
         return urlCache[url]
     req = Request(url)
-    req.add_header('Cookie', 'view_mature=true')
+    req.add_header('Cookie', autharea.designCookie('view_mature=true'))
     conn = urlopen(req)
     res = str(conn.read()).replace(r'\t','') \
                .replace('\r','') \
@@ -73,6 +76,29 @@ def get_opener(proxy):
         opener = build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(cookiejar.CookieJar()))
     return opener
 
+def userBool(inp):
+    """Convert inp to bool: False unless 'y' or 'yes' or 'true' or '1'"""
+    inp = inp.lower()
+    result = False
+    if inp == 'y' or inp == 'yes' or inp == 'true' or inp == '1':
+        result = True
+    return result
+
+def get_user_shelves(username, password):
+    lib = []
+    loadFromSite = userBool(input('Use all bookshelves on the site (y/n)? '))
+    if loadFromSite:
+        return autharea.get_user_shelves(username, password)
+    inp = ''
+    while True:
+        inp = input('Next bookshelf or return to finish\n%s: ' % lib)
+        if inp.isdigit():
+            lib.append(int(inp))
+            print(lib)
+        else:
+            break
+    return lib
+
 def findFavCount():
     raise NotImplementedError('findFavCount not done')
 
@@ -85,8 +111,10 @@ def findAllLinks(pageData):
 def loadStory(pageData):
     raise NotImplementedError('loadStory not done')
 
-def main(method=TOTAL_WORDS_READ,proxy='') :
+def main(method=TOTAL_WORDS_READ, proxy='', bookshelves=[], username=None, password=None) :
     try :
+        if len(bookshelves) == 0:
+            bookshelves = get_user_shelves(username, password)
         opener = get_opener(proxy)
         # setup login
         install_opener(opener)

@@ -20,7 +20,6 @@ import math
 TOTAL_WORDS_READ = "totalWords"
 PARTIALLY_READ_STORIES = "partialStories"
 
-cookie=''
 fimbase = 'https://www.fimfiction.net'
 
 # cache for multiple runs in one go
@@ -34,7 +33,7 @@ def getUrl(url):
     if url in urlCache.keys() :
         return urlCache[url]
     req = Request(url)
-    req.add_header('Cookie', cookie+'; view_mature=true')
+    req.add_header('Cookie', 'view_mature=true')
     conn = urlopen(req)
     res = str(conn.read()).replace(r'\t','') \
                .replace('\r','') \
@@ -46,46 +45,6 @@ def getUrl(url):
                .replace('&quot;','"')
     urlCache[url] = res
     return res
-    
-def findAll(string, sub, offset=0):
-    listindex=[]
-    i = string.find(sub, offset)
-    while i >= 0:
-        listindex.append(i)
-        i = string.find(sub, i + 1)
-    return listindex
-
-# block read list
-waituntilpat = re.compile(r'<table +class *= *[\'"]browse_stories[\'"]', re.DOTALL | re.MULTILINE)
-linkpat = re.compile(r'<a +href *= *[\'"](.+?)[\'"]', re.DOTALL | re.MULTILINE)
-
-def findAllLinks(pageData):
-    starthere = waituntilpat.search(pageData).start()
-    return linkpat.findall(pageData, starthere)
-
-storytitlepat = re.compile(r'<a class="story_name.+?>(.+?)</a>', re.DOTALL | re.MULTILINE)
-chapterpat = re.compile(r'<div class="word_count">\s*?(?!<b>)(.+?)<', re.DOTALL | re.MULTILINE)
-strictcpat = re.compile(r'<i class=.+?chapter-read(?!-icon).+?<div class="word_count">\s*?(?!<b>)(.+?)<', re.DOTALL | re.MULTILINE)
-storywcpat = re.compile(r'<div class="word_count">\s*?<b>(.+?)<', re.DOTALL | re.MULTILINE)
-
-def loadStory(storyData):
-    """
-    Returns a tuple of data:
-    (word count, read word count, title)
-    """
-    title = storytitlepat.findall(storyData)[0]
-    chapterwordcnt = chapterpat.findall(storyData)
-    chapterwordcnt = [int(deprettify(x)) for x in chapterwordcnt if x.strip() != '']
-    chapterwcadd = sum(chapterwordcnt)
-    storywordcnt = int(deprettify(storywcpat.findall(storyData)[0]))
-    if chapterwcadd != storywordcnt :
-        print('Chapters added != Story Word Count')
-        return (storywordcnt, 0, title)
-    strictwc = 0
-    strictchwc = strictcpat.findall(storyData)
-    strictchwc = [int(deprettify(x)) for x in strictchwc if x.strip() != '']
-    strictwc = sum(strictchwc)
-    return (chapterwcadd, strictwc, title)
 
 def deprettify(numstr):
     return numstr.replace(',', '').strip()
@@ -100,82 +59,52 @@ def getPage(pagenum):
         + str(pagenum))
     return data
 
-def deterPageCount(storyCount):
-    page1 = getPage(1)
-
-    # decode story count
-    # find title links in HTML
-    indexes=findAll(page1,r'class="title">')
-
-    # this matches the heading title as well
-    # so we remove it
-    indexes = indexes[1:]
-    # find word count in html
-    indexes2=findAll(page1,r'class="info">')
-    # story count mismatch check
-    # usually indicates site layout change
-    if len(indexes) == len(indexes2):
-        storiesPerPage = len(indexes)
-        if storiesPerPage == 0 :
-            return 0
-        return int(math.ceil(float(storyCount) / float(storiesPerPage)))
-    else:
-        raise SyntaxError()
-    
 def failWith(stri):
     print(stri)
     if input("Press enter to exit") == "debug" :
         raise AssertionError(stri)
     sys.exit()
 
-globdebug = dict()
+def get_opener(proxy):
+    if proxy!='':
+        opener = build_opener(ProxyHandler({'http':proxy}),HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(cookiejar.CookieJar()))
+        print('Using proxy: ' + proxy)
+    else:
+        opener = build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(cookiejar.CookieJar()))
+    return opener
 
-def main(username='',password='',method=TOTAL_WORDS_READ,proxy='') :
-    global cookie, globdebug
+def findFavCount():
+    raise NotImplementedError('findFavCount not done')
+
+def deterPageCount(favCount):
+    raise NotImplementedError('deterPageCount not done')
+
+def findAllLinks(pageData):
+    raise NotImplementedError('findAllLinks not done')
+
+def loadStory(pageData):
+    raise NotImplementedError('loadStory not done')
+
+def main(method=TOTAL_WORDS_READ,proxy='') :
     try :
-        # request basic data
-        if username=='': username = input("Username: ")
-        if password=='': password = input("Password: ")
-        # proxy
-        if proxy!='': 
-            opener = build_opener(ProxyHandler({'http':proxy}),HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(cookiejar.CookieJar()))
-            print('Using proxy : ' + proxy)
-        else:
-            opener = build_opener(HTTPBasicAuthHandler(),HTTPHandler,HTTPCookieProcessor(cookiejar.CookieJar()))
+        opener = get_opener(proxy)
         # setup login
-        login_data = parse.urlencode({'username':username,'password':password}).encode('ascii')
-        ret = opener.open(fimbase + '/ajax/login.php',login_data)
         install_opener(opener)
-        # check fail
-        if str(ret.read()).find('0') == -1: 
-            failWith('Login failed, check your username and password')
-        cookie=ret.info()['Set-Cookie']
         print('Connected to FimFiction')
         # load fav data
-        favData = getUrl(fimbase + '/ajax/infocard_user.php?name='+username).replace(',','')
         nFavs = 0
         curPage = 1
         nStories = 0
         counter = 0
         # check for favs
-        favURLRegex = r'<a href="(/index.php\?view=category&user=\d+&tracking=1)">\d+ favourites'
-        favURLResult = re.search(favURLRegex, favData, re.MULTILINE)
-        favNumRegex = r'<div class="search_results_count">\s+Viewing <b>\d+</b> - <b>\d+</b> of <b>(\d+)</b> stories\s+</div>'
-        if favURLResult != None:
-            nFavs = int(re.search(favNumRegex, getUrl(fimbase + favURLResult.group(1)), re.MULTILINE).group(1))
-        else:
-            print(favData)
-            raise LookupError('Error finding number of favorites')
+        nFavs = findFavCount()
         print ('Found ' + str(nFavs) + ' favorites')
         nPages = deterPageCount(nFavs)
         file = open('readlist.txt','w')
 
         allstorylinks = []
-
-        globdebug['links'] = allstorylinks
-        
         # read favs
-        while curPage<=nPages:
+        while curPage <= nPages:
             print('Loading page ' + str(curPage) + '/' + str(nPages) + '...')
             data = getPage(curPage)
             links = findAllLinks(data)
@@ -188,11 +117,9 @@ def main(username='',password='',method=TOTAL_WORDS_READ,proxy='') :
 
         procd = 0
         lastput = 0
-
         # process favs
         print('Processing...')
         for lnk in allstorylinks:
-            globdebug['lastlink'] = lnk
             data = getUrl(lnk)
             sdata = loadStory(data)
             writestr = None

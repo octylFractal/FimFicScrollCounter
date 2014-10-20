@@ -1,5 +1,4 @@
-import py2to3compat
-py3 = py2to3compat.PYTHON_VERSION_MAJOR > 2
+py3 = __import__('sys').version_info[0] > 2
 import sys
 
 # local libs

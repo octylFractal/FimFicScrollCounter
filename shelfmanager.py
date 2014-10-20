@@ -1,6 +1,6 @@
 """Literally everything to do with the actual processing and sorting"""
-from util import importlocal, get_url, FIMFICTION
-bs4 = importlocal('bs4')
+from util import get_url, FIMFICTION
+from commonimports import bs4
 
 def get_word_count(story):
     pass

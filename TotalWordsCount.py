@@ -2,7 +2,7 @@
 import autharea
 import shelfmanager
 from commonimports import request
-from util import *
+from util import get_opener, number_objects, F_VES_ENDINGS, user_bool, fail, py3
 
 # some differnt data getters
 TOTAL_WORDS_READ = "totalWords"

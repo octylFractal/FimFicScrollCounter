@@ -1,5 +1,5 @@
 from __future__ import print_function
-
+from util import py3
 
 def fix(builtin):
     isdict = type(builtin) is dict
@@ -32,8 +32,8 @@ def fix(builtin):
     if has("raw_input"):
         mv("raw_input", "input")
 
-PYTHON_VERSION_MAJOR = __import__('sys').version_info[0]
-if PYTHON_VERSION_MAJOR == 3:
+if py3:
     fix(__import__('builtins'))
 else:
     fix(__import__('__builtin__'))
+__all__ = []

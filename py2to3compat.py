@@ -1,4 +1,6 @@
 from __future__ import print_function
+
+
 def fix(builtin):
     isdict = type(builtin) is dict
     def moduleset(k, v):
@@ -20,14 +22,18 @@ def fix(builtin):
         set_ = dictset
         get_ = dictget
 
-    def has(s) :
+    def has(s):
         return s in dbins
-    def mv(here, there) :
+    def mv(here, there):
         set_(there, get_(here))
 
-    if has("xrange") :
+    if has("xrange"):
         mv("xrange", "range")
-    if has("raw_input") :
+    if has("raw_input"):
         mv("raw_input", "input")
 
 PYTHON_VERSION_MAJOR = __import__('sys').version_info[0]
+if PYTHON_VERSION_MAJOR == 3:
+    fix(__import__('builtins'))
+else:
+    fix(__import__('__builtin__'))

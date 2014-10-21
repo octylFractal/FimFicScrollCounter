@@ -104,7 +104,7 @@ def get_url(url):
 def get_page(shelf, pagenum):
     # pull page
     data = get_url(
-        FIMFICTION + '/stories?order=date_added&completed=1&bookshelf={}&unread=1&page={}'.format(shelf, pagenum))
+        FIMFICTION + 'bookshelf/{}/?order=date_added&page={}'.format(shelf, pagenum))
     return data
 
 __import__('autharea')

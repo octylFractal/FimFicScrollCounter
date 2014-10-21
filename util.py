@@ -1,8 +1,8 @@
-py3 = __import__('sys').version_info[0] > 2
 import sys
+import re
 
 # local libs
-from commonimports import request, cookiejar
+from commonimports import request, cookiejar, PYTHON_MAJOR
 autharea = None  # installed by autharea
 
 class PrintAndFile():
@@ -34,7 +34,7 @@ def add_local_import_path(name):
     global syspathmod
     if syspathmod:
         return
-    sys.path.append('./py%slibs' % py2to3compat.PYTHON_VERSION_MAJOR)
+    sys.path.append('./py%slibs' % PYTHON_MAJOR)
     syspathmod = True
         
 
@@ -46,16 +46,17 @@ def deprettify(numstr):
 def prettify(num):
     return "{:,}".format(num)
 
-NONE_S_ENDINGS = ('', 's')
-F_VES_ENDINGS = ('f', 'ves')
-NONE_ES_ENDINGS = ('', 'es')
-
-def number_objects(count, base, endings=NONE_S_ENDINGS):
-    return str(count) + ' ' + (base + endings[0] if count == 1 else base + endings[1])
+pluralpat = re.compile(r'(.*)\((.*)\|(.*)\)')
+def number_objects(count, wordstyle):
+    match = pluralpat.match(wordstyle)
+    if not match:
+        raise ValueError("wordstyle must be in style: base(singular|plural)")
+    base = match.group(1)
+    return str(count) + ' ' + (base + match.group(2) if count == 1 else base + match.group(3))
 
 def fail(stri):
     print(stri)
-    if input("Press enter to exit") == "debug" :
+    if input("Press enter to exit") == "debug":
         raise AssertionError(stri)
     sys.exit()
 
@@ -96,14 +97,7 @@ def get_url(url):
         req = request.Request(url)
         req.add_header('Cookie', autharea.design_cookie('view_mature=true'))
         conn = request.urlopen(req)
-        res = str(conn.read()).replace(r'\t','') \
-                   .replace('\r','') \
-                   .replace('\n','') \
-                   .replace(r'\r','') \
-                   .replace(r'\n','') \
-                   .replace('&#039;','\'') \
-                   .replace('&amp;','&') \
-                   .replace('&quot;','"')
+        res = str(conn.read())
         urlCache[url] = res
     return urlCache[url]
 
@@ -115,5 +109,5 @@ def get_page(shelf, pagenum):
 
 __import__('autharea')
 __all__ = ['PrintAndFile', 'output', 'importlocal', 'FIMFICTION', 'number_objects',
-           'F_VES_ENDINGS', 'NONE_ES_ENDINGS', 'NONE_S_ENDINGS', 'prettify', 'deprettify',
-           'fail', 'get_opener', 'get_page', 'get_url', 'py3', 'opener', 'user_bool']
+           'prettify', 'deprettify', 'fail', 'get_opener', 'get_page', 'get_url',
+           'py3', 'opener', 'user_bool']

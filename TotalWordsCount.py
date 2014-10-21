@@ -1,8 +1,8 @@
 # local libs
 import autharea
 import shelfmanager
-from commonimports import request
-from util import get_opener, number_objects, F_VES_ENDINGS, user_bool, fail, py3
+from commonimports import request, py3
+from util import get_opener, number_objects, user_bool, fail
 
 # some differnt data getters
 TOTAL_WORDS_READ = "totalWords"
@@ -30,7 +30,7 @@ def main(method=TOTAL_WORDS_READ, proxy='', bookshelves=[], username=None, passw
         # setup login
         request.install_opener(get_opener(proxy))
         lenbook = len(bookshelves)
-        print('Connected to FimFiction, analyzing ' + number_objects(lenbook, 'bookshel', F_VES_ENDINGS) + '.')
+        print('Connected to FimFiction, analyzing ' + number_objects(lenbook, 'bookshel(f|ves)') + '.')
         for shelf in bookshelves:
             obj = shelfmanager.Shelf(int(shelf), username, password)
             wc = obj.get_wordcount()

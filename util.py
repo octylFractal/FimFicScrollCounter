@@ -101,13 +101,19 @@ def get_url(url):
         urlCache[url] = res
     return urlCache[url]
 
-def get_page(shelf, pagenum):
+FULL_VIEW = 0
+LIST_VIEW = 1
+CARD_VIEW = 2
+
+def get_page(shelf, pagenum, view=LIST_VIEW):
     # pull page
     data = get_url(
-        FIMFICTION + 'bookshelf/{}/?order=date_added&page={}'.format(shelf, pagenum))
+        FIMFICTION +\
+        'bookshelf/{}/?order=date_added&page={}&compact_view={}'\
+        .format(shelf, pagenum, view))
     return data
 
 __import__('autharea')
 __all__ = ['PrintAndFile', 'output', 'importlocal', 'FIMFICTION', 'number_objects',
            'prettify', 'deprettify', 'fail', 'get_opener', 'get_page', 'get_url',
-           'py3', 'opener', 'user_bool']
+           'py3', 'opener', 'user_bool', 'FULL_VIEW', 'LIST_VIEW', 'CARD_VIEW']

@@ -43,7 +43,13 @@ from commonimports import request, cookiejar
 FIMFICTION = 'https://www.fimfiction.net'
 
 def deprettify(numstr):
-    return numstr.replace(',', '').strip(' \t\n\r')
+    return numstr.replace(','  , '') \
+                 .replace(r'\t', '') \
+                 .replace('\r' , '') \
+                 .replace('\n' , '') \
+                 .replace(r'\r', '') \
+                 .replace(r'\n', '') \
+                 .strip(' \t\n\r')
 
 def prettify(num):
     return "{:,}".format(num)

@@ -2,7 +2,6 @@ import sys
 import re
 
 # local libs
-from commonimports import request, cookiejar, PYTHON_MAJOR
 autharea = None  # installed by autharea
 
 class PrintAndFile():
@@ -34,14 +33,17 @@ def add_local_import_path(name):
     global syspathmod
     if syspathmod:
         return
-    sys.path.append('./py%slibs' % PYTHON_MAJOR)
+    sys.path.append('./py%slibs' % sys.version_info[0])
     syspathmod = True
-        
+
+# down here because cyclic deps
+from commonimports import request, cookiejar
+
 
 FIMFICTION = 'https://www.fimfiction.net'
 
 def deprettify(numstr):
-    return numstr.replace(',', '').strip()
+    return numstr.replace(',', '').strip(' \t\n\r')
 
 def prettify(num):
     return "{:,}".format(num)

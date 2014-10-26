@@ -33,7 +33,7 @@ def add_local_import_path(name):
     global syspathmod
     if syspathmod:
         return
-    sys.path.append('./py%slibs' % sys.version_info[0])
+    sys.path.insert(0, './py%slibs' % sys.version_info[0])
     syspathmod = True
 
 # down here because cyclic deps

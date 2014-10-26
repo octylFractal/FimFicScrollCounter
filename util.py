@@ -109,7 +109,7 @@ def get_page(shelf, pagenum, view=LIST_VIEW):
     # pull page
     data = get_url(
         FIMFICTION +\
-        'bookshelf/{}/?order=date_added&page={}&compact_view={}'\
+        '/bookshelf/{}/?order=date_added&page={}&compact_view={}'\
         .format(shelf, pagenum, view))
     return data
 

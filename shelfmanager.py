@@ -15,7 +15,7 @@ def get_story_data(story):
     story - url to story, assumed relative to FIMFICTION
     """
     if story not in url_cache:
-        print('Loading story data of', story)
+        #print('Loading story data of', story)
         soup = bs4.BeautifulSoup(get_url(FIMFICTION + story), 'lxml')
         name = str(soup(class_="story_name")[0].string)
         chapters = soup(class_="word_count")
@@ -29,7 +29,7 @@ def get_story_data(story):
         url_cache[story] = {
             'name': name, 'story_wc': story_wc, 'per_chapter_wc': chapter_indiv_wc, 'chapter_wc_sum': chapter_wc_sum
         }
-        print(story + "'s data:", url_cache[story])
+        #print(story + "'s data:", url_cache[story])
     return url_cache[story]
 
 class Shelf():

@@ -34,7 +34,7 @@ def main(method=TOTAL_WORDS_READ, proxy='', bookshelves=[], username=None, passw
         for shelf in bookshelves:
             obj = shelfmanager.Shelf(int(shelf), username, password)
             wc = obj.get_wordcount()
-            print(shelf, "=", wc)
+            #print(shelf, "=", wc)
         input('Press enter to exit')
     except SystemExit:
         pass

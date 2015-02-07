@@ -7,14 +7,16 @@ autharea = None  # installed by autharea
 class PrintAndFile():
     def __init__(this, file):
         this.file = file
+        this.print = print
 
     def println(this, message):
-        print(message)
-        print(message, file=this.file, flush=True)
+        this.print(message)
+        this.print(message, file=this.file, flush=True)
 
     def close(this):
         this.file.close()
-output = PrintAndFile(open('readlist.txt', 'w'))
+output = PrintAndFile(open('readlist.txt', 'w+'))
+print = output.println
 
 syspathmod = False
 importtable = {}
@@ -55,12 +57,16 @@ def prettify(num):
     return "{:,}".format(num)
 
 pluralpat = re.compile(r'(.*)\((.*)\|(.*)\)')
+__pluralpatcache = dict()
 def number_objects(count, wordstyle):
-    match = pluralpat.match(wordstyle)
-    if not match:
-        raise ValueError("wordstyle must be in style: base(singular|plural)")
+    if not wordstyle in __pluralpatcache:
+        match = pluralpat.match(wordstyle)
+        if not match:
+            raise ValueError("wordstyle must be in style: base(singular|plural)")
+        __pluralpatcache[wordstyle] = match
+    match = __pluralpatcache[wordstyle]
     base = match.group(1)
-    return str(count) + ' ' + (base + match.group(2) if count == 1 else base + match.group(3))
+    return str(count) + ' ' + (base + match.group(2) if abs(count) == 1 else base + match.group(3))
 
 def fail(stri):
     print(stri)

@@ -79,7 +79,12 @@ class Shelf():
         if this.pages is None:
             print('Determing pages for', this.shelf)
             soup = this.first_page
-            last_page = soup(class_="page_list")[0].ul('li')[-2].a.string
+            pages = soup(class_="page_list")[0].ul('li')
+            if len(pages) < 2:
+                # only one page
+                last_page = 1
+            else:
+                last_page = pages[-2].string
             this.pages = int(last_page)
             print('Page count is', this.pages, 'for', this.shelf)
         return this.pages

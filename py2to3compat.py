@@ -1,25 +1,39 @@
 from __future__ import print_function
-def fix(__builtins__):
-    isdict = type(__builtins__) is dict
+from util import py3
+
+def fix(builtin):
+    isdict = type(builtin) is dict
+    def moduleset(k, v):
+        setattr(builtin, k, v)
+    def moduleget(k, d=None):
+        return getattr(builtin, k, d)
     # default to module
-    delfunction = delattr
-    dbins = dir(__builtins__)
+    set_ = moduleset
+    get_ = moduleget
+    dbins = dir(builtin)
 
     if isdict:
         # dict of builtins, use it
-        dbins = __builtins__
-        delfunction = dict.pop
+        dbins = builtin
+        def dictset(k, v):
+            builtin[k] = v
+        def dictget(k, d=None):
+            return builtin.get(k, d)
+        set_ = dictset
+        get_ = dictget
 
-    def has(s) :
+    def has(s):
         return s in dbins
-    def rem(s) :
-        before = eval(s)
-        # delfunction(__builtins__, s)
-        return before
+    def mv(here, there):
+        set_(there, get_(here))
 
-    if has("xrange") :
-        __builtins__.range = rem("xrange")
-    if has("raw_input") :
-        __builtins__.input = rem("raw_input")
+    if has("xrange"):
+        mv("xrange", "range")
+    if has("raw_input"):
+        mv("raw_input", "input")
 
-PYTHON_VERSION_MAJOR = __import__('sys').version_info[0]
+if py3:
+    fix(__import__('builtins'))
+else:
+    fix(__import__('__builtin__'))
+__all__ = []

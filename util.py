@@ -9,8 +9,8 @@ class PrintAndFile():
         this.file = file
 
     def println(this, message):
-        this.file.write(message + '\n')
         print(message)
+        print(message, file=this.file, flush=True)
 
     def close(this):
         this.file.close()

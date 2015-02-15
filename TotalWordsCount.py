@@ -9,6 +9,7 @@ from util import get_opener, number_objects, user_bool, fail, print
 TOTAL_WORDS = "total_words"
 WORDS_READ_BY_STORY_READ = "read_by_story"
 WORDS_READ_BY_CHAPTER_READ = "read_by_chapter"
+ALL = [TOTAL_WORDS, WORDS_READ_BY_CHAPTER_READ, WORDS_READ_BY_STORY_READ]
 
 def get_user_shelves(username, password):
     lib = []
@@ -32,11 +33,13 @@ def read_by_story(allshelves):
 def read_by_chapter(allshelves):
     print('By Chapter NYI')
 
-def main(method=TOTAL_WORDS, proxy='', bookshelves=[], username=None, password=None):
+def main(method='', proxy='', bookshelves=[], username=None, password=None):
     util.output.open()
     try:
-        if len(bookshelves) == 0:
-            bookshelves = get_user_shelves(username, password)
+        bookshelves = bookshelves or get_user_shelves(username, password)
+        method = method or input('Choose a analyzer ' +\
+                                 str(ALL).replace('[', '(').replace(']', ')') +\
+                                 ':')
         # setup login
         request.install_opener(get_opener(proxy))
         lenbook = len(bookshelves)

@@ -5,38 +5,38 @@ import re
 autharea = None  # installed by autharea
 
 class PrintAndFile():
-    def __init__(this, file):
-        this.file = file
-        this.print = print
+    def __init__(this, target):
+        this.target = target
+        this.file = None
+        this.oldprint = print
 
-    def println(this, message):
-        this.print(message)
-        this.print(message, file=this.file, flush=True)
+    def print(this, *message, sep=' ', end='\n', file=None, flush=False):
+        this.oldprint(*message, sep=sep, end=end, file=file, flush=flush)
+        this.oldprint(*message, sep=sep, end=end, file=this.file, flush=True)
 
     def close(this):
         this.file.close()
-output = PrintAndFile(open('readlist.txt', 'w+'))
-print = output.println
+    def open(this):
+        this.file = open(this.target, 'w+')
+        
+output = PrintAndFile('readlist.txt')
+print = output.print
 
 syspathmod = False
-importtable = {}
+def add_local_import_path():
+    global syspathmod
+    if syspathmod:
+        return
+    sys.path.insert(0, './py%slibs' % sys.version_info[0])
+    syspathmod = True
+add_local_import_path()
 def importlocal(name):
     """
     Import the given module.
     Acts pretty much like __import__(name),
     but the local py<major version>libs folder is added to the path
     """
-    if not name in importtable:
-        add_local_import_path(name)
-        importtable[name] = __import__(name)
-    return importtable[name]
-
-def add_local_import_path(name):
-    global syspathmod
-    if syspathmod:
-        return
-    sys.path.insert(0, './py%slibs' % sys.version_info[0])
-    syspathmod = True
+    return __import__(name)
 
 # down here because cyclic deps
 from commonimports import request, cookiejar
@@ -130,4 +130,5 @@ def get_page(shelf, pagenum, view=LIST_VIEW):
 __import__('autharea')
 __all__ = ['PrintAndFile', 'output', 'importlocal', 'FIMFICTION', 'number_objects',
            'prettify', 'deprettify', 'fail', 'get_opener', 'get_page', 'get_url',
-           'py3', 'opener', 'user_bool', 'FULL_VIEW', 'LIST_VIEW', 'CARD_VIEW']
+           'print', 'py3', 'opener', 'user_bool', 'FULL_VIEW', 'LIST_VIEW',
+           'CARD_VIEW']

@@ -1,5 +1,5 @@
 """Literally everything to do with the actual processing and sorting"""
-from util import get_page, get_url, deprettify, prettify, number_objects, FIMFICTION, LIST_VIEW
+from util import get_page, get_url, deprettify, print, prettify, number_objects, FIMFICTION, LIST_VIEW
 from commonimports import bs4
 
 url_cache = {}

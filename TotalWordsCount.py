@@ -1,12 +1,14 @@
 # local libs
 import autharea
 import shelfmanager
+import util
 from commonimports import request, py3
-from util import get_opener, number_objects, user_bool, fail
+from util import get_opener, number_objects, user_bool, fail, print
 
 # some differnt data getters
-TOTAL_WORDS_READ = "totalWords"
-PARTIALLY_READ_STORIES = "partialStories"
+TOTAL_WORDS = "total_words"
+WORDS_READ_BY_STORY_READ = "read_by_story"
+WORDS_READ_BY_CHAPTER_READ = "read_by_chapter"
 
 def get_user_shelves(username, password):
     lib = []
@@ -23,7 +25,15 @@ def get_user_shelves(username, password):
             break
     return lib
 
-def main(method=TOTAL_WORDS_READ, proxy='', bookshelves=[], username=None, password=None):
+def total_words(allshelves):
+    print('Total Words NYI')
+def read_by_story(allshelves):
+    print('By Story NYI')
+def read_by_chapter(allshelves):
+    print('By Chapter NYI')
+
+def main(method=TOTAL_WORDS, proxy='', bookshelves=[], username=None, password=None):
+    util.output.open()
     try:
         if len(bookshelves) == 0:
             bookshelves = get_user_shelves(username, password)
@@ -31,10 +41,12 @@ def main(method=TOTAL_WORDS_READ, proxy='', bookshelves=[], username=None, passw
         request.install_opener(get_opener(proxy))
         lenbook = len(bookshelves)
         print('Connected to FimFiction, analyzing ' + number_objects(lenbook, 'bookshel(f|ves)') + '.')
+        shelves = []
         for shelf in bookshelves:
             obj = shelfmanager.Shelf(int(shelf), username, password)
-            wc = obj.get_wordcount()
-            #print(shelf, "=", wc)
+            shelves.append(obj)
+        # call the appropriate method
+        globals()[method](shelves)
         input('Press enter to exit')
     except SystemExit:
         pass
@@ -52,10 +64,10 @@ def main(method=TOTAL_WORDS_READ, proxy='', bookshelves=[], username=None, passw
                 debug = True
             return debug
         reraise = do_fail()
-        if reraise and py3:
+        if reraise:
             raise
-        elif reraise:
-            raise
+    finally:
+        util.output.close()
 
 if __name__ == "__main__":
     main()

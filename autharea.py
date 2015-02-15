@@ -16,11 +16,9 @@ def possibly_req_auth(username, password):
     if logged_in:
         return
     if not usr:
-        if not username: username = input('Username: ')
-        usr = username
+        usr = username or input('Username: ')
     if not pas:
-        if not password: password = input('Password: ')
-        pas = password
+        pas = password or input('Password: ')
     login_data = parse.urlencode(
         {'username': usr,'password': pas}
         ).encode('ascii')

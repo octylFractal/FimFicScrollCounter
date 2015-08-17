@@ -6,20 +6,20 @@ autharea = None  # installed by autharea
 
 
 class PrintAndFile():
-    def __init__(this, target):
-        this.target = target
-        this.file = None
-        this.oldprint = print
+    def __init__(self, target):
+        self.target = target
+        self.file = None
+        self.oldprint = print
 
-    def print(this, *message, sep=' ', end='\n', file=None, flush=False):
-        this.oldprint(*message, sep=sep, end=end, file=file, flush=flush)
-        this.oldprint(*message, sep=sep, end=end, file=this.file, flush=True)
+    def print(self, *message, sep=' ', end='\n', file=None, flush=False):
+        self.oldprint(*message, sep=sep, end=end, file=file, flush=flush)
+        self.oldprint(*message, sep=sep, end=end, file=this.file, flush=True)
 
-    def close(this):
-        this.file.close()
+    def close(self):
+        self.file.close()
 
-    def open(this):
-        this.file = open(this.target, 'w+')
+    def open(self):
+        self.file = open(this.target, 'w+')
 
 
 output = PrintAndFile('readlist.txt')
@@ -75,7 +75,7 @@ __pluralpatcache = dict()
 
 
 def number_objects(count, wordstyle):
-    if not wordstyle in __pluralpatcache:
+    if wordstyle not in __pluralpatcache:
         match = pluralpat.match(wordstyle)
         if not match:
             raise ValueError("wordstyle must be in style: base(singular|plural)")
@@ -138,8 +138,8 @@ CARD_VIEW = 2
 def get_page(shelf, pagenum, view=LIST_VIEW):
     # pull page
     data = get_url(
-        FIMFICTION + \
-        '/bookshelf/{}/?order=date_added&page={}&compact_view={}' \
+        FIMFICTION +
+        '/bookshelf/{}/?order=date_added&page={}&compact_view={}'
         .format(shelf, pagenum, view))
     return data
 

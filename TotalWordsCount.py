@@ -2,7 +2,7 @@
 import autharea
 import shelfmanager
 import util
-from util import number_objects, user_bool, fail, print
+from util import get_session, number_objects, user_bool, fail, print
 
 # some differnt data getters
 TOTAL_WORDS = "total_words"
@@ -45,9 +45,11 @@ def read_by_chapter(allshelves):
 def main(method='', proxy=None, bookshelves=[], username=None, password=None):
     util.output.open()
     try:
+        # activate proxy
+        get_session(proxy)
         bookshelves = bookshelves or get_user_shelves(username, password)
-        method = method or input('Choose a analyzer ' + \
-                                 str(ALL).replace('[', '(').replace(']', ')') + \
+        method = method or input('Choose a analyzer ' +
+                                 str(ALL).replace('[', '(').replace(']', ')') +
                                  ':')
         # setup login
         lenbook = len(bookshelves)

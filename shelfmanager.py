@@ -50,7 +50,14 @@ class Shelf():
             self.find_count()
             self.deter_page_count()
             self.load_stories()
-            self.wordcount = sum(get_story_data(x)['story_wc'] for x in self.stories)
+            self.wordcount = 0
+            counted = 0
+            for story in self.stories:
+                wc = get_story_data(story)['story_wc']
+                counted += 1
+                self.wordcount += wc
+                print('{}/{} stories calculated, current word count is {}'.format(
+                    counted, len(self.stories), self.wordcount))
             print('Loaded word count for', self.shelf)
         return self.wordcount
 

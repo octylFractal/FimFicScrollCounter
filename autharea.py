@@ -3,10 +3,10 @@ import re
 
 # local libs
 from commonimports import parse
-from util import importlocal, FIMFICTION, get_url, get_opener, fail
+from util import importlocal, FIMFICTION, get_url, get_session, fail
 bs4 = importlocal('bs4')
+requests = importlocal('requests')
 
-localCookie = ''
 usr = ''
 pas = ''
 logged_in = False
@@ -22,25 +22,13 @@ def possibly_req_auth(username, password):
     login_data = parse.urlencode(
         {'username': usr,'password': pas}
         ).encode('ascii')
-    ret = get_opener().open(FIMFICTION + '/ajax/login.php', login_data)
-    if str(ret.read()).find('0') == -1: 
+    print('open', FIMFICTION + '/ajax/login.php', login_data)
+    ret = get_session().post(FIMFICTION + '/ajax/login.php', data={'username': usr, 'password': pas})
+    print(type(ret.json()))
+    if 'signing_key' not in ret.json():
         fail('Login failed, check your username and password')
     logged_in = True
-    localCookie = ret.info()['Set-Cookie']
-    return (usr, pas)
-
-def design_cookie(additional_cookies=[]):
-    if type(additional_cookies) is str:
-        additional_cookies = [x.strip() for x in additional_cookies.split(";")]
-    cookie = ''
-    if localCookie:
-        cookie = localCookie
-    for add in additional_cookies:
-        if cookie:
-            cookie += '; ' + add
-        else:
-            cookie = add
-    return cookie
+    return usr, pas
 
 patterns = {'bookshelfid': re.compile(r'/bookshelf/(\d+)/.+')}
 

@@ -38,8 +38,10 @@ def importlocal(name):
     """
     return __import__(name)
 
-# down here because cyclic deps
-from commonimports import request, cookiejar
+try:
+    import requests
+except ImportError:
+    requests = importlocal('requests')
 
 
 FIMFICTION = 'https://www.fimfiction.net'
@@ -82,38 +84,27 @@ def user_bool(inp):
         result = True
     return result
 
-opener = None
-def get_opener(proxy=''):
-    global opener
-    if not opener is None:
-        return opener
-    if proxy != '':
-        opener = request.build_opener(
-                              request.ProxyHandler({'http':proxy}),
-                              request.HTTPBasicAuthHandler(),
-                              request.HTTPHandler,
-                              request.HTTPCookieProcessor(cookiejar.CookieJar()))
-        print('Using proxy: ' + proxy)
-    else:
-        opener = request.build_opener(
-                              request.HTTPBasicAuthHandler(),
-                              request.HTTPHandler,
-                              request.HTTPCookieProcessor(cookiejar.CookieJar()))
-    return opener
+_session = None
+def get_session(proxy=None) -> requests.Session:
+    global _session
+    if _session is None:
+        _session = requests.Session()
+        if proxy:
+            _session.proxies = {'http': proxy}
+            print('Using proxy: ' + proxy)
+        _session.cookies['view_mature'] = 'true'
+    return _session
 
 # cache for multiple runs in one go
-urlCache = {}
+_url_cache = {}
 def reset_cache():
-    urlCache.clear()
+    _url_cache.clear()
 
 def get_url(url):
-    if not url in urlCache.keys():
-        req = request.Request(url)
-        req.add_header('Cookie', autharea.design_cookie('view_mature=true'))
-        conn = request.urlopen(req)
-        res = str(conn.read())
-        urlCache[url] = res
-    return urlCache[url]
+    if url not in _url_cache.keys():
+        request = requests.get(url)
+        _url_cache[url] = request.text
+    return _url_cache[url]
 
 FULL_VIEW = 0
 LIST_VIEW = 1
@@ -129,6 +120,6 @@ def get_page(shelf, pagenum, view=LIST_VIEW):
 
 __import__('autharea')
 __all__ = ['PrintAndFile', 'output', 'importlocal', 'FIMFICTION', 'number_objects',
-           'prettify', 'deprettify', 'fail', 'get_opener', 'get_page', 'get_url',
-           'print', 'py3', 'opener', 'user_bool', 'FULL_VIEW', 'LIST_VIEW',
+           'prettify', 'deprettify', 'fail', 'get_session', 'get_page', 'get_url',
+           'print', 'py3', 'user_bool', 'FULL_VIEW', 'LIST_VIEW',
            'CARD_VIEW']

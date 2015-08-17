@@ -2,8 +2,7 @@
 import autharea
 import shelfmanager
 import util
-from commonimports import request, py3
-from util import get_opener, number_objects, user_bool, fail, print
+from util import number_objects, user_bool, fail, print
 
 # some differnt data getters
 TOTAL_WORDS = "total_words"
@@ -26,14 +25,17 @@ def get_user_shelves(username, password):
             break
     return lib
 
-def total_words(allshelves):
-    print('Total Words NYI')
+def total_words(allshelves: list):
+    words = 0
+    for s in allshelves:
+        words += s.get_wordcount()
+    print('Total words for', allshelves, '=', words)
 def read_by_story(allshelves):
     print('By Story NYI')
 def read_by_chapter(allshelves):
     print('By Chapter NYI')
 
-def main(method='', proxy='', bookshelves=[], username=None, password=None):
+def main(method='', proxy=None, bookshelves=[], username=None, password=None):
     util.output.open()
     try:
         bookshelves = bookshelves or get_user_shelves(username, password)
@@ -41,7 +43,6 @@ def main(method='', proxy='', bookshelves=[], username=None, password=None):
                                  str(ALL).replace('[', '(').replace(']', ')') +\
                                  ':')
         # setup login
-        request.install_opener(get_opener(proxy))
         lenbook = len(bookshelves)
         print('Connected to FimFiction, analyzing ' + number_objects(lenbook, 'bookshel(f|ves)') + '.')
         shelves = []

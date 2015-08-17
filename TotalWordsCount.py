@@ -48,9 +48,12 @@ def main(method='', proxy=None, bookshelves=[], username=None, password=None):
         # activate proxy
         get_session(proxy)
         bookshelves = bookshelves or get_user_shelves(username, password)
-        method = method or input('Choose a analyzer ' +
-                                 str(ALL).replace('[', '(').replace(']', ')') +
-                                 ':')
+        method = method or input('Choose an analyzer ' +
+                                 str(ALL)
+                                 .replace('[', '(')
+                                 .replace(']', ')')
+                                 .replace("'", "") +
+                                 ': ')
         # setup login
         lenbook = len(bookshelves)
         print('Connected to FimFiction, analyzing ' + number_objects(lenbook, 'bookshel(f|ves)') + '.')

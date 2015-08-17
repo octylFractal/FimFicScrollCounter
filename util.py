@@ -13,13 +13,13 @@ class PrintAndFile():
 
     def print(self, *message, sep=' ', end='\n', file=None, flush=False):
         self.oldprint(*message, sep=sep, end=end, file=file, flush=flush)
-        self.oldprint(*message, sep=sep, end=end, file=this.file, flush=True)
+        self.oldprint(*message, sep=sep, end=end, file=self.file, flush=True)
 
     def close(self):
         self.file.close()
 
     def open(self):
-        self.file = open(this.target, 'w+')
+        self.file = open(self.target, 'w+')
 
 
 output = PrintAndFile('readlist.txt')

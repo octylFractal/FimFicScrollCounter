@@ -4,6 +4,7 @@ from commonimports import bs4
 
 url_cache = {}
 
+
 def get_story_data(story):
     """
     Get story data from fimfic:
@@ -15,7 +16,7 @@ def get_story_data(story):
     story - url to story, assumed relative to FIMFICTION
     """
     if story not in url_cache:
-        #print('Loading story data of', story)
+        # print('Loading story data of', story)
         soup = bs4.BeautifulSoup(get_url(FIMFICTION + story), 'lxml')
         name = str(soup(class_="story_name")[0].string)
         chapters = soup(class_="word_count")
@@ -24,13 +25,14 @@ def get_story_data(story):
         chapter_indiv_wc = [int(deprettify(x.get_text())) for x in chapters]
         chapter_wc_sum = sum(chapter_indiv_wc)
         if story_wc != chapter_wc_sum:
-            print('WARNING: chapter word count ({}) did not match story word count ({}) for story {}'\
+            print('WARNING: chapter word count ({}) did not match story word count ({}) for story {}' \
                   .format(story_wc, chapter_wc_sum, name))
         url_cache[story] = {
             'name': name, 'story_wc': story_wc, 'per_chapter_wc': chapter_indiv_wc, 'chapter_wc_sum': chapter_wc_sum
         }
-        #print(story + "'s data:", url_cache[story])
+        # print(story + "'s data:", url_cache[story])
     return url_cache[story]
+
 
 class Shelf():
     def __init__(self, shelf_id, username='', password=''):
@@ -102,7 +104,8 @@ class Shelf():
             s = []
             for page in range(self.pages):
                 print('Loading page', page, 'out of', self.pages, 'for', self.shelf)
-                soup = self.first_page if page == 0 else bs4.BeautifulSoup(get_page(self.shelf, page + 1, LIST_VIEW), 'lxml')
+                soup = self.first_page if page == 0 else bs4.BeautifulSoup(get_page(self.shelf, page + 1, LIST_VIEW),
+                                                                           'lxml')
                 bold_tags = soup(class_="search_results_count")[0]('b')
                 from_ = int(bold_tags[0].string)
                 to = int(bold_tags[1].string)

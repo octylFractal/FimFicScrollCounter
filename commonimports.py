@@ -15,5 +15,6 @@ else:
     import Cookie as cookies
     import urllib2 as request
 import util
+
 bs4 = util.importlocal('bs4')
 __all__ = ['parse', 'cookiejar', 'cookies', 'request', 'bs4', 'py3', 'PYTHON_MAJOR']

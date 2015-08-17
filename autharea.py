@@ -4,12 +4,14 @@ import re
 # local libs
 from commonimports import parse
 from util import importlocal, FIMFICTION, get_url, get_session, fail
+
 bs4 = importlocal('bs4')
 requests = importlocal('requests')
 
 usr = ''
 pas = ''
 logged_in = False
+
 
 def possibly_req_auth(username, password):
     global usr, pas, logged_in, localCookie
@@ -20,8 +22,8 @@ def possibly_req_auth(username, password):
     if not pas:
         pas = password or input('Password: ')
     login_data = parse.urlencode(
-        {'username': usr,'password': pas}
-        ).encode('ascii')
+        {'username': usr, 'password': pas}
+    ).encode('ascii')
     print('open', FIMFICTION + '/ajax/login.php', login_data)
     ret = get_session().post(FIMFICTION + '/ajax/login.php', data={'username': usr, 'password': pas})
     print(type(ret.json()))
@@ -30,7 +32,9 @@ def possibly_req_auth(username, password):
     logged_in = True
     return usr, pas
 
+
 patterns = {'bookshelfid': re.compile(r'/bookshelf/(\d+)/.+')}
+
 
 def get_user_shelves(username, password):
     (username, password) = possibly_req_auth(username, password)
@@ -45,5 +49,6 @@ def get_user_shelves(username, password):
             match = patterns['bookshelfid'].match(link)
             lib.append(int(match.group(1)))
     return lib
+
 
 __import__('util').autharea = sys.modules[__name__]

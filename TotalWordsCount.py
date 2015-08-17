@@ -10,6 +10,7 @@ WORDS_READ_BY_STORY_READ = "read_by_story"
 WORDS_READ_BY_CHAPTER_READ = "read_by_chapter"
 ALL = [TOTAL_WORDS, WORDS_READ_BY_CHAPTER_READ, WORDS_READ_BY_STORY_READ]
 
+
 def get_user_shelves(username, password):
     lib = []
     load_from_site = user_bool(input('Use all bookshelves on the site (y/n)? '))
@@ -25,22 +26,28 @@ def get_user_shelves(username, password):
             break
     return lib
 
+
 def total_words(allshelves: list):
     words = 0
     for s in allshelves:
         words += s.get_wordcount()
     print('Total words for', allshelves, '=', words)
+
+
 def read_by_story(allshelves):
     print('By Story NYI')
+
+
 def read_by_chapter(allshelves):
     print('By Chapter NYI')
+
 
 def main(method='', proxy=None, bookshelves=[], username=None, password=None):
     util.output.open()
     try:
         bookshelves = bookshelves or get_user_shelves(username, password)
-        method = method or input('Choose a analyzer ' +\
-                                 str(ALL).replace('[', '(').replace(']', ')') +\
+        method = method or input('Choose a analyzer ' + \
+                                 str(ALL).replace('[', '(').replace(']', ')') + \
                                  ':')
         # setup login
         lenbook = len(bookshelves)
@@ -67,11 +74,13 @@ def main(method='', proxy=None, bookshelves=[], username=None, password=None):
             except AssertionError:
                 debug = True
             return debug
+
         reraise = do_fail()
         if reraise:
             raise
     finally:
         util.output.close()
+
 
 if __name__ == "__main__":
     main()

@@ -18,28 +18,32 @@ def get_story_data(story):
     story - url to story, assumed relative to FIMFICTION
     """
     if story not in url_cache:
-        # print('Loading story data of', story)
-        soup = bs4.BeautifulSoup(get_url(FIMFICTION + story), 'lxml')
-        name = str(soup(class_="story_name")[0].string)
-        chapters = [x.parent for x in soup(class_="word_count")]
-        story_wc = int(deprettify(chapters[-1].b.string))
-        chapters = chapters[:-1]
-        chapter_indiv_wc = [
-            (int(deprettify(x(class_="word_count")[0].get_text())),
-             'chapter-read' in x('i')[0]['class'])
-            for x in chapters
-            ]
-        chapter_wc_sum = sum(map(lambda x: x[0], chapter_indiv_wc))
-        if story_wc != chapter_wc_sum:
-            print('WARNING: chapter word count ({}) did not match story word count ({}) for story {}'
-                  .format(story_wc, chapter_wc_sum, name))
-        url_cache[story] = {
-            'name': name,
-            'story_wc': story_wc,
-            'per_chapter_wc': chapter_indiv_wc,
-            'chapter_wc_sum': chapter_wc_sum
-        }
-        # print(story + "'s data:", url_cache[story])
+        try:
+            # print('Loading story data of', story)
+            soup = bs4.BeautifulSoup(get_url(FIMFICTION + story), 'lxml')
+            name = str(soup(class_="story_name")[0].string)
+            chapters = [x.parent for x in soup(class_="word_count")]
+            story_wc = int(deprettify(chapters[-1].b.string))
+            chapters = chapters[:-1]
+            chapter_indiv_wc = [
+                (int(deprettify(x(class_="word_count")[0].get_text())),
+                 'chapter-read' in x('i')[0]['class'])
+                for x in chapters
+                ]
+            chapter_wc_sum = sum(map(lambda x: x[0], chapter_indiv_wc))
+            if story_wc != chapter_wc_sum:
+                print('WARNING: chapter word count ({}) did not match story word count ({}) for story {}'
+                      .format(story_wc, chapter_wc_sum, name))
+            url_cache[story] = {
+                'name': name,
+                'story_wc': story_wc,
+                'per_chapter_wc': chapter_indiv_wc,
+                'chapter_wc_sum': chapter_wc_sum
+            }
+            # print(story + "'s data:", url_cache[story])
+        except Exception:
+            print('Error on story', story)
+            raise
     return url_cache[story]
 
 
@@ -120,7 +124,7 @@ class Shelf:
         return self.stories
 
     def _load_page_concurrently(self, page):
-        print('Loading page', page, 'out of', self.pages, 'for', self.shelf)
+        print('Loading page', page + 1, 'out of', self.pages, 'for', self.shelf)
         soup = self.first_page if page == 0 else bs4.BeautifulSoup(get_page(self.shelf, page + 1, LIST_VIEW),
                                                                    'lxml')
         bold_tags = soup(class_="search_results_count")[0]('b')

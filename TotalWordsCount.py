@@ -2,13 +2,13 @@
 import autharea
 import shelfmanager
 import util
-from util import get_session, number_objects, user_bool, fail, print
+from util import get_session, number_objects, user_bool, fail, print, prettify
 
 # some differnt data getters
-TOTAL_WORDS = "total_words"
+TOTAL_WORDS_READ = "total_words"
 WORDS_READ_BY_STORY_READ = "read_by_story"
 WORDS_READ_BY_CHAPTER_READ = "read_by_chapter"
-ALL = [TOTAL_WORDS, WORDS_READ_BY_CHAPTER_READ, WORDS_READ_BY_STORY_READ]
+ALL = [TOTAL_WORDS_READ, WORDS_READ_BY_CHAPTER_READ, WORDS_READ_BY_STORY_READ]
 
 
 def get_user_shelves(username, password):
@@ -31,7 +31,7 @@ def total_words(allshelves: list):
     words = 0
     for s in allshelves:
         words += s.get_wordcount()
-    print('Total words for', allshelves, '=', words)
+    print('Total words for', [x.shelf for x in allshelves], '=', prettify(words))
 
 
 def read_by_story(allshelves):

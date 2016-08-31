@@ -125,8 +125,9 @@ class Shelf:
 
     def _load_page_concurrently(self, page):
         print('Loading page', page + 1, 'out of', self.pages, 'for', self.shelf)
-        soup = self.first_page if page == 0 else bs4.BeautifulSoup(get_page(self.shelf, page + 1, LIST_VIEW),
-                                                                   'lxml')
+        soup = self.first_page if page == 0 else bs4.BeautifulSoup(
+            get_page(self.shelf, page + 1, LIST_VIEW),
+            'lxml')
         bold_tags = soup(class_="search_results_count")[0]('b')
         from_ = int(bold_tags[0].string)
         to = int(bold_tags[1].string)

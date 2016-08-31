@@ -25,33 +25,8 @@ class PrintAndFile():
 output = PrintAndFile('readlist.txt')
 print = output.print
 
-syspathmod = False
 
-
-def add_local_import_path():
-    global syspathmod
-    if syspathmod:
-        return
-    sys.path.insert(0, './py%slibs' % sys.version_info[0])
-    syspathmod = True
-
-
-add_local_import_path()
-
-
-def importlocal(name):
-    """
-    Import the given module.
-    Acts pretty much like __import__(name),
-    but the local py<major version>libs folder is added to the path
-    """
-    return __import__(name)
-
-
-try:
-    import requests
-except ImportError:
-    requests = importlocal('requests')
+import requests
 
 FIMFICTION = 'https://www.fimfiction.net'
 

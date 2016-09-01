@@ -1,6 +1,7 @@
 """Literally everything to do with the actual processing and sorting"""
 from util import get_page, get_url, deprettify, print, prettify, number_objects, FIMFICTION, LIST_VIEW
 from commonimports import bs4
+from itertools import chain
 from concurrent.futures import ThreadPoolExecutor
 
 url_cache = {}
@@ -114,16 +115,11 @@ class Shelf:
     def load_stories(self):
         if self.stories is None:
             print('Loading story urls for', self.shelf)
-            with ThreadPoolExecutor(max_workers=10) as executor:
-                s = []
-                for page in range(self.pages):
-                    print('Spinning off task', page)
-                    s.append(executor.submit(self._load_page_concurrently, page))
-                self.stories = tuple(sum((list(x.result()) for x in s), list()))
+            self.stories = list(chain.from_iterable(self.load_page(page) for page in range(self.pages)))
             print(number_objects(len(self.stories), 'url(|s)'), 'loaded for', self.shelf)
         return self.stories
 
-    def _load_page_concurrently(self, page):
+    def load_page(self, page):
         print('Loading page', page + 1, 'out of', self.pages, 'for', self.shelf)
         soup = self.first_page if page == 0 else bs4.BeautifulSoup(
             get_page(self.shelf, page + 1, LIST_VIEW),

@@ -11,12 +11,13 @@ WORDS_READ_BY_CHAPTER_READ = "read_by_chapter"
 ALL = [TOTAL_WORDS_READ, WORDS_READ_BY_CHAPTER_READ, WORDS_READ_BY_STORY_READ]
 
 
-def get_user_shelves(username, password):
+def get_user_shelves(username, password, use_all):
     lib = []
-    load_from_site = user_bool(input('Use all bookshelves on the site (y/n)? '))
+    load_from_site = (user_bool(input('Use all bookshelves on the site (y/n)? '))
+                      if use_all is None
+                      else use_all)
     if load_from_site:
         return autharea.get_user_shelves(username, password)
-    inp = ''
     while True:
         inp = input('Next bookshelf or return to finish\n%s: ' % lib)
         if inp.isdigit():
@@ -42,12 +43,12 @@ def read_by_chapter(allshelves):
     print('By Chapter NYI')
 
 
-def main(method='', proxy=None, bookshelves=[], username=None, password=None):
+def main(method='', proxy=None, bookshelves=tuple(), username=None, password=None, use_all=None):
     util.output.open()
     try:
         # activate proxy
         get_session(proxy)
-        bookshelves = bookshelves or get_user_shelves(username, password)
+        bookshelves = bookshelves or get_user_shelves(username, password, use_all)
         method = method or input('Choose an analyzer ' +
                                  str(ALL)
                                  .replace('[', '(')

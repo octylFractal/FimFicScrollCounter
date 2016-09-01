@@ -2,7 +2,6 @@
 from util import get_page, get_url, deprettify, print, prettify, number_objects, FIMFICTION, LIST_VIEW
 from commonimports import bs4
 from itertools import chain
-from concurrent.futures import ThreadPoolExecutor
 
 url_cache = {}
 

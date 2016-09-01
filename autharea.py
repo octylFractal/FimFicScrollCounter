@@ -2,7 +2,7 @@ import sys
 import re
 
 # local libs
-from util import FIMFICTION, get_url, get_session, fail
+from util import FIMFICTION, get_url, get_session, fail_or_e
 from commonimports import bs4
 
 usr = ''
@@ -18,9 +18,13 @@ def possibly_req_auth(username, password):
         usr = username or input('Username: ')
     if not pas:
         pas = password or input('Password: ')
-    ret = get_session().post(FIMFICTION + '/ajax/login.php', data={'username': usr, 'password': pas})
-    if 'signing_key' not in ret.json():
-        fail('Login failed, check your username and password')
+    ret = get_session().post(FIMFICTION + '/ajax/login', data={'username': usr, 'password': pas})
+    try:
+        data = ret.json()
+        if 'signing_key' not in data:
+            raise AssertionError()
+    except BaseException as e:
+        fail_or_e('Login failed, check your username and password', e)
     logged_in = True
     return usr, pas
 
@@ -31,7 +35,7 @@ patterns = {'bookshelfid': re.compile(r'/bookshelf/(\d+)/.+')}
 def get_user_shelves(username, password):
     username, password = possibly_req_auth(username, password)
     library = get_url(FIMFICTION + ('/user/{}/library'.format(username)))
-    libsoup = bs4.BeautifulSoup(library)
+    libsoup = bs4.BeautifulSoup(library, 'lxml')
     shlvs = libsoup(class_='bookshelf-card')
     lib = []
     for shlf in shlvs:

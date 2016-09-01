@@ -59,6 +59,11 @@ def number_objects(count, wordstyle):
     base = match.group(1)
     return str(count) + ' ' + (base + match.group(2) if abs(count) == 1 else base + match.group(3))
 
+def fail_or_e(stri, e):
+    try:
+        fail(stri)
+    except AssertionError:
+        raise e
 
 def fail(stri):
     print(stri)

@@ -71,8 +71,8 @@ class Shelf:
                 wc = get_story_data(story)['story_wc']
                 counted += 1
                 self.wordcount += wc
-                print('{}/{} stories calculated, current word count is {}'.format(
-                    prettify(counted), prettify(len(self.stories)), prettify(self.wordcount)))
+                print('    {}: {}/{} stories calculated, current word count is {}'.format(
+                    self.shelf, prettify(counted), prettify(len(self.stories)), prettify(self.wordcount)))
             print('Loaded word count for', self.shelf)
         return self.wordcount
 

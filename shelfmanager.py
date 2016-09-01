@@ -52,12 +52,18 @@ class Shelf:
         self.shelf = shelf_id
         self.usr = username
         self.pas = password
-        self.first_page = bs4.BeautifulSoup(get_page(self.shelf, 1, LIST_VIEW), 'lxml')
+        self._first_page = None
         self.story_count = None
         self.pages = None
         self.stories = None
         self.perchap_wc = None
         self.wordcount = None
+
+    @property
+    def first_page(self):
+        if self._first_page is None:
+            self._first_page = bs4.BeautifulSoup(get_page(self.shelf, 1, LIST_VIEW), 'lxml')
+        return self._first_page
 
     def get_wordcount(self):
         if self.wordcount is None:

@@ -4,3 +4,4 @@ __pycache__/
 *.html
 *.pyc
 .idea
+.localrun.py

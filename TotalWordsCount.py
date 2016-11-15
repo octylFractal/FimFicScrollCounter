@@ -2,20 +2,22 @@
 import autharea
 import shelfmanager
 import util
-from util import number_objects, user_bool, fail, print
+from util import get_session, number_objects, user_bool, fail, print, prettify
 
 # some differnt data getters
-TOTAL_WORDS = "total_words"
+TOTAL_WORDS_READ = "total_words"
 WORDS_READ_BY_STORY_READ = "read_by_story"
 WORDS_READ_BY_CHAPTER_READ = "read_by_chapter"
-ALL = [TOTAL_WORDS, WORDS_READ_BY_CHAPTER_READ, WORDS_READ_BY_STORY_READ]
+ALL = [TOTAL_WORDS_READ, WORDS_READ_BY_CHAPTER_READ, WORDS_READ_BY_STORY_READ]
 
-def get_user_shelves(username, password):
+
+def get_user_shelves(username, password, use_all):
     lib = []
-    load_from_site = user_bool(input('Use all bookshelves on the site (y/n)? '))
+    load_from_site = (user_bool(input('Use all bookshelves on the site (y/n)? '))
+                      if use_all is None
+                      else use_all)
     if load_from_site:
         return autharea.get_user_shelves(username, password)
-    inp = ''
     while True:
         inp = input('Next bookshelf or return to finish\n%s: ' % lib)
         if inp.isdigit():
@@ -25,23 +27,34 @@ def get_user_shelves(username, password):
             break
     return lib
 
+
 def total_words(allshelves: list):
     words = 0
     for s in allshelves:
         words += s.get_wordcount()
-    print('Total words for', allshelves, '=', words)
+    print('Total words for', [x.shelf for x in allshelves], '=', prettify(words))
+
+
 def read_by_story(allshelves):
     print('By Story NYI')
+
+
 def read_by_chapter(allshelves):
     print('By Chapter NYI')
 
-def main(method='', proxy=None, bookshelves=[], username=None, password=None):
+
+def main(method='', proxy=None, bookshelves=tuple(), username=None, password=None, use_all=None):
     util.output.open()
     try:
-        bookshelves = bookshelves or get_user_shelves(username, password)
-        method = method or input('Choose a analyzer ' +\
-                                 str(ALL).replace('[', '(').replace(']', ')') +\
-                                 ':')
+        # activate proxy
+        get_session(proxy)
+        bookshelves = bookshelves or get_user_shelves(username, password, use_all)
+        method = method or input('Choose an analyzer ' +
+                                 str(ALL)
+                                 .replace('[', '(')
+                                 .replace(']', ')')
+                                 .replace("'", "") +
+                                 ': ')
         # setup login
         lenbook = len(bookshelves)
         print('Connected to FimFiction, analyzing ' + number_objects(lenbook, 'bookshel(f|ves)') + '.')
@@ -67,11 +80,13 @@ def main(method='', proxy=None, bookshelves=[], username=None, password=None):
             except AssertionError:
                 debug = True
             return debug
+
         reraise = do_fail()
         if reraise:
             raise
     finally:
         util.output.close()
+
 
 if __name__ == "__main__":
     main()

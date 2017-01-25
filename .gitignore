@@ -1,6 +1,4 @@
-readlist.txt
-private_test.bat
 __pycache__/
 *.html
 *.pyc
-.idea
+.idea/

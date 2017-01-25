@@ -1,12 +1,16 @@
-Fimfiction-TotalWordsRead
+FimFicScrollCounter
 =========================
 
-This script gives the word count of the read chapters in your favorites. It also gives total word count and total word count per story.
+A program to give you the word count of all read chapters or stories in a bookshelf.
+It also can give you total word count of a bookshelf.
 
-Requires Python.
+It requires Python 3.6 to be installed.
 
-How to use :
-- Install Python, make sure you're connected to internet and start TotalWordsCount.py
-- Enter your username/password
-- Wait until the script downloads your favorites and gives you the total word count
-- You can find the list of all the stories with their wordcount and the total word count in readlist.txt
+How to use:
+- Install Python
+- Install this package using [`pip`](https://pip.pypa.io/en/stable/)
+- Run cli.py for command-line usage, or download one of the program packages for a GUI version
+- Input your username and password OR your FimFiction session token (if you know what that is and want to be more secure)
+    - You don't need to do this if you are just grabbing the total word count of a public bookshelf
+- Choose the bookshelves you want to count up
+- Get results!
